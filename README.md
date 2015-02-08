@@ -86,6 +86,8 @@ Changes(Feel Free to Report Any Bugs to Me):
 
 -Fixed infinite siren after bank reload on a running server.
 
+-Removed useless stuff from the code.
+
 Quick Questions:
 
 1.The Robbery fails imediataly after starting it!
