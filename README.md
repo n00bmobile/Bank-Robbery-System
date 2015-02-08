@@ -107,7 +107,3 @@ Restart your server and make sure that you saved the Config File.
 5.I remember seeing this on CoderHire/Script Fodder...
 
 I started this project wanting to clone the Bank Robbery System from Script Fodder, they both do the same but the code is all mine.
-
-6.Some files are saying that they're from Beta Ver 1.3... The newest one is Beta Ver 1.4! Where can I get the rest of the Beta Ver 1.4 files?
-
-It doesn't mean that it's outdated, it only means that it hasn't been modified since Beta Ver 1.3!
