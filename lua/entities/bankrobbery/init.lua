@@ -97,8 +97,7 @@ end
 function SirenLoop()
     BroadcastLua('surface.PlaySound("sirenloud.wav")')
     timer.Create("SoundLoop",12,0,function()
-        BankReloadTimer()
-		BroadcastLua('surface.PlaySound("sirenloud.wav")')
+        BroadcastLua('surface.PlaySound("sirenloud.wav")')
     end)
 end
 
@@ -108,7 +107,7 @@ end
 function BankReloadTimer()
     if !DuringRobbery then 
 	    timer.Destroy("SoundLoop")
-    end
+	end
 end
 
 ----------------
@@ -140,7 +139,6 @@ function ENT:InCooldown()
 	end
 	DuringRobbery = false
 	Bank_RobberyCTimerReset = Bank_RobberyCooldownTime
-	timer.Destroy("SoundLoop")
 	timer.Create("BankRooberyCooldown",1,Bank_RobberyCooldownTime,function()
 	    Bank_RobberyCTimerReset = Bank_RobberyCTimerReset -1
         if Bank_RobberyCTimerReset <= 0 then
@@ -156,7 +154,8 @@ end
 -----------
 function ENT:Think()
     self:BankSendData()
-    if DuringRobbery then
+    BankReloadTimer()
+	if DuringRobbery then
 	    self:NotInRadius()
         self:CheckIfDead()
 	    self:CheckJob()
@@ -268,8 +267,7 @@ function ResetEverything()
 	table.Empty(ReceiverName)
 	timer.Destroy("BankRobberyCountDown")
     timer.Destroy("BankRobberyCountDown")
-    timer.Destroy("SoundLoop")
-	CanBankRobbery = true
+    CanBankRobbery = true
     Bank_RobberyDTimerReset = Bank_RobberyTime
     DuringRobbery = false
     NotEnoughPlayers = false
