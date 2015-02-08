@@ -36,9 +36,9 @@ This addon is inspired by the Bank Robbery System available from Script Fodder. 
 
 Credits:
 
-Me (U DON'T SAY)
+n00bmobile (Me)
 
-HunterFP (For Helping Me)
+HunterFP (For helping me with the Perma Spawn System)
 
 Planned Updates:
 
