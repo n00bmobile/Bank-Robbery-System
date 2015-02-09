@@ -90,7 +90,7 @@ Quick Questions:
 
 1.The Robbery fails imediataly after starting it!
 
-Set a position for the Bank Vault, the default one is conflicting with the Bank that you just spawned.
+Set a position for the Bank, the default one from the config file is conflicting with the Bank that you just spawned from the spawn menu. You can only have one active bank on a map. 
 
 2.I tried to change the Bank Vault model... It gave me errors!
 
