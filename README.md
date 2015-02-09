@@ -74,11 +74,7 @@ Changes(Feel Free to Report Any Bugs to Me):
 
 -Fixed notification spelling mistake.
 
--Added new console command called bank_reset.
-
 -Fixed infinite wanted.
-
--Fixed problems with bank_reset.
 
 -New siren sound effect(loop).
 
@@ -87,6 +83,8 @@ Changes(Feel Free to Report Any Bugs to Me):
 -Fixed infinite siren after bank reload on a running server.
 
 -Removed useless stuff from the code.
+
+-Removed bank_reset because of admin abuse.
 
 Quick Questions:
 

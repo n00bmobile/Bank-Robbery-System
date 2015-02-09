@@ -257,28 +257,6 @@ function ENT:NotInRadius()
     end
 end
 
-----------------------
--- RESET EVERYTHING --
-----------------------
-function ResetEverything()
-    for k,bank in pairs(ReceiverName) do
-	    bank:setDarkRPVar("wanted",false)
-	end
-	table.Empty(ReceiverName)
-	timer.Destroy("BankRobberyCountDown")
-    timer.Destroy("BankRobberyCountDown")
-    CanBankRobbery = true
-    Bank_RobberyDTimerReset = Bank_RobberyTime
-    DuringRobbery = false
-    NotEnoughPlayers = false
-    EnoughTeam = false
-    Bank_RobberyCTimerReset = Bank_RobberyCooldownTime
-    for k,ply in pairs(player.GetAll()) do
-	    DarkRP.notify(ply,0,5,"The Bank Robbery System has been reseted by an admin.") 
-    end
-end
-concommand.Add("bank_reset",ResetEverything)
-
 ------------------
 -- SPAWN SYSTEM --
 ------------------
