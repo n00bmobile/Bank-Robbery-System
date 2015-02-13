@@ -18,7 +18,7 @@ local Bank_RobberyDTimerReset = Bank_RobberyTime
 local DuringRobbery = false
 local NotEnoughPlayers = false
 local EnoughTeam = false
-local Bank_RobberyCTimerReset = Bank_RobberyCTimerReset
+local Bank_RobberyCTimerReset = Bank_RobberyCooldownTime
 Bank_TeamCanRob = Bank_TeamCanRob
 ReceiverName = {}
 util.PrecacheSound( "sirenloud.wav" )
@@ -68,13 +68,13 @@ function ENT:Use(activator,caller)
     CheckJobRequirement()
 	CheckPlayers()
 	if !table.HasValue( Bank_TeamCanRob,team.GetName(caller:Team())) then
-	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,"You cannot start a robbery as a " ..team.GetName(caller:Team()).. "!") end)
+	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,string.Replace(Bank_WrongTeam,"%PLAYERJOB%",team.GetName(caller:Team()))) end)
 	elseif NotEnoughPlayers then
-	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,"There has to be at least " ..Bank_MinPlayers.. " players before you can rob the Bank!") end)
+	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,string.Replace(Bank_WrongPlayerNumber,"%MINPLAYERS%",tostring(Bank_MinPlayers))) end)
 	elseif !EnoughTeam then
-	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,"There has to be at least " ..Bank_RequiredGovernmentNumber.. " cops before you can rob the Bank!") end)
+	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,string.Replace(Bank_WrongCopNumber,"%MINCOPS%",tostring(Bank_RequiredGovernmentNumber))) end)
 	elseif !DuringRobbery && !CanBankRobbery then
-	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,"You need to wait " ..Bank_RobberyCTimerReset.. " seconds before you can rob the Bank!") end)
+	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,string.Replace(Bank_WrongCooldown,"%COOLDOWNTIME%",tostring(Bank_RobberyCTimerReset))) end)
     elseif CanBankRobbery && EnoughTeam then
 	    if table.HasValue(Bank_TeamCanRob,team.GetName(caller:Team())) then
             DuringRobbery = true
@@ -82,9 +82,9 @@ function ENT:Use(activator,caller)
 			table.insert(ReceiverName,caller)
 		    SirenLoop()
 			caller:setDarkRPVar("wanted",true)
-            caller:setDarkRPVar("wantedReason","Robbing the Bank!")
+            caller:setDarkRPVar("wantedReason",Bank_WantedReason)
 	    for k,v in pairs(player.GetAll()) do
-			DarkRP.notify(v,0,5,caller:Nick().. " has started a robbery and will complete it in " ..Bank_RobberyTime.. " seconds!" ) 
+			DarkRP.notify(v,0,5,string.Replace(Bank_StartRobbery,"%PLAYERNAME%",caller:Nick()))
         end
             self:InRobbery()
 	    end
@@ -120,7 +120,7 @@ function ENT:InRobbery()
 	    if Bank_RobberyDTimerReset <= 0 && DuringRobbery then 
 		    for k,v in pairs(player.GetAll()) do
 			    for k,bank in pairs(ReceiverName) do
-				    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(v,0,5,bank:Nick().. " finished the robbery!") end)
+				    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(v,0,5,string.Replace(Bank_FinishRobberySucess,"%PLAYERNAME%",bank:Nick())) end)
 				    timer.Create("EvadeSpam",0.1,1,function() bank:addMoney(Bank_StartingAmount) end)
 			    end
 				self:InCooldown()
@@ -201,7 +201,7 @@ function ENT:CheckJob()
     for k,bank in pairs(ReceiverName) do
 	    for k,v in pairs(player.GetAll()) do
 	        if DuringRobbery && !table.HasValue(Bank_TeamCanRob,team.GetName(bank:Team())) then
-	            DarkRP.notify(v,1,5,bank:Nick().. " changed jobs during a robbery!")
+	            DarkRP.notify(v,1,5,string.Replace(Bank_FinishRobberyFailJob,"%PLAYERNAME%",bank:Nick()))
                 self:InCooldown()
 				timer.Destroy("BankRobberyCountDown")
 	        end
@@ -217,7 +217,7 @@ function ENT:CheckIfDead()
 	    for k,v in pairs(player.GetAll()) do
 		    for k,bank in pairs(ReceiverName) do
                 if DuringRobbery && table.HasValue(Bank_TeamCanRob,team.GetName(bank:Team())) && !bank:Alive() then
-			   	    DarkRP.notify(v,1,5,bank:Nick().. " died during a robbery!")	
+			   	    DarkRP.notify(v,1,5,string.Replace(Bank_FinishRobberyFailDie,"%PLAYERNAME%",bank:Nick()))	
 					self:InCooldown()
 					timer.Destroy("BankRobberyCountDown")
                 end
@@ -230,13 +230,13 @@ end
 -- SEND DATA --
 ---------------
 function ENT:BankSendData()
-    self:SetNWInt("Bank_StartingAmount","$" ..Bank_StartingAmount or 0)
+    self:SetNWInt("Bank_StartingAmount",string.Replace(Bank_DisplayAmount,"%BANKAMOUNT%",tostring(Bank_StartingAmount)))
 	if DuringRobbery then
-	    self:SetNWInt("BankClient","Robbing: " ..Bank_RobberyDTimerReset or 0)
+	    self:SetNWInt("BankClient",string.Replace(Bank_DisplayRobbing,"%ROBBERYTIME%",tostring(Bank_RobberyDTimerReset)))
 	elseif !DuringRobbery && !CanBankRobbery then
-	    self:SetNWInt("BankClient","Cooldown: " ..Bank_RobberyCTimerReset or 0)
+	    self:SetNWInt("BankClient",string.Replace(Bank_DisplayCooldown,"%COOLDOWNTIME%",tostring(Bank_RobberyCTimerReset)))
     elseif CanBankRobbery then
-	    self:SetNWInt("BankClient","Waiting")
+	    self:SetNWInt("BankClient",Bank_DisplayWaiting)
     end
 end
 
@@ -249,7 +249,7 @@ function ENT:NotInRadius()
 	        if DuringRobbery then
 		        if bank:GetPos():Distance(self:GetPos()) >= Bank_RobberyMaxRadius then
                     self:InCooldown()
-				    DarkRP.notify(v,1,5,bank:Nick().. " exited the robbery area!")
+				    DarkRP.notify(v,1,5,string.Replace(Bank_FinishRobberyFailArea,"%PLAYERNAME%",bank:Nick()))
 				    timer.Destroy("BankRobberyCountDown")
 		        end
             end
