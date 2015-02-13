@@ -86,6 +86,8 @@ Changes(Feel Free to Report Any Bugs to Me):
 
 -Removed bank_reset because of admin abuse.
 
+-Added translation option in the config file.
+
 Quick Questions:
 
 1.The Robbery fails imediataly after starting it!
