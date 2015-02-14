@@ -8,9 +8,7 @@
 -- n00bmobile(Me Of Course).
 -- HunterFP for helping me with the Perma Spawn System.
 
----------------
 -- Variables --
----------------
 local classname = "bankrobbery"
 local ShouldSetOwner = true
 local CanBankRobbery = true
@@ -30,9 +28,7 @@ include( "shared.lua" )
 include( "bank_config.lua" )
 -------------------------------
 
---------------------
 -- SPAWN FUNCTION --
---------------------
 function ENT:SpawnFunction(v,tr)
 if (!tr.Hit) then return end
 	local Bank_SpawnPos = tr.HitPos + tr.HitNormal * 25
@@ -46,9 +42,7 @@ if (!tr.Hit) then return end
 	    return ent
 end
 
-----------------
 -- INITIALIZE --
-----------------
 function ENT:Initialize()
 self.Entity:SetModel( Bank_ChooseModel )
 self.Entity:PhysicsInit( SOLID_VPHYSICS )
@@ -61,9 +55,7 @@ local phys = self.Entity:GetPhysicsObject()
     end
 end
 
-------------
 -- ON USE --
-------------
 function ENT:Use(activator,caller)
     CheckJobRequirement()
 	CheckPlayers()
@@ -91,9 +83,7 @@ function ENT:Use(activator,caller)
     end 
 end
 
-----------------
 -- SOUND LOOP --
-----------------
 function SirenLoop()
     BroadcastLua('surface.PlaySound("sirenloud.wav")')
     timer.Create("SoundLoop",12,0,function()
@@ -101,18 +91,14 @@ function SirenLoop()
     end)
 end
 
--------------------------
 -- EVADE FOREVER SIREN --
--------------------------
 function BankReloadTimer()
     if !DuringRobbery then 
 	    timer.Destroy("SoundLoop")
 	end
 end
 
-----------------
 -- IN ROBBERY --
----------------- 
 function ENT:InRobbery()
     Bank_RobberyDTimerReset = Bank_RobberyTime
 	timer.Create("BankRobberyCountDown",1,Bank_RobberyTime,function()
@@ -130,9 +116,7 @@ function ENT:InRobbery()
     end)
 end
 
------------------
 -- IN COOLDOWN --
------------------
 function ENT:InCooldown()
     for k,bank in pairs(ReceiverName) do
 	    bank:setDarkRPVar("wanted",false)
@@ -149,9 +133,7 @@ function ENT:InCooldown()
     end)
 end
 
------------
 -- THINK --
------------
 function ENT:Think()
     self:BankSendData()
     BankReloadTimer()
@@ -162,9 +144,7 @@ function ENT:Think()
     end
 end
 
------------------------------
 -- CHECK AMOUNT OF PLAYERS --
------------------------------
 function CheckPlayers()
     if #player.GetAll() < Bank_MinPlayers then
 	    NotEnoughPlayers = true
@@ -173,9 +153,7 @@ function CheckPlayers()
     end
 end
 
----------------------------
 -- CHECK JOB REQUIREMENT --
----------------------------
 function CheckJobRequirement()
     RequiredGovernment = 0
 	EnoughTeam = false
@@ -194,9 +172,7 @@ function CheckJobRequirement()
     end
 end
 
----------------
 -- CHECK JOB --
----------------
 function ENT:CheckJob()
     for k,bank in pairs(ReceiverName) do
 	    for k,v in pairs(player.GetAll()) do
@@ -209,9 +185,8 @@ function ENT:CheckJob()
     end
 end
 
--------------------
+
 -- CHECK IF DEAD --
--------------------
 function ENT:CheckIfDead()
     if DuringRobbery then
 	    for k,v in pairs(player.GetAll()) do
@@ -226,23 +201,7 @@ function ENT:CheckIfDead()
     end
 end
 
----------------
--- SEND DATA --
----------------
-function ENT:BankSendData()
-    self:SetNWInt("Bank_StartingAmount",string.Replace(Bank_DisplayAmount,"%BANKAMOUNT%",tostring(Bank_StartingAmount)))
-	if DuringRobbery then
-	    self:SetNWInt("BankClient",string.Replace(Bank_DisplayRobbing,"%ROBBERYTIME%",tostring(Bank_RobberyDTimerReset)))
-	elseif !DuringRobbery && !CanBankRobbery then
-	    self:SetNWInt("BankClient",string.Replace(Bank_DisplayCooldown,"%COOLDOWNTIME%",tostring(Bank_RobberyCTimerReset)))
-    elseif CanBankRobbery then
-	    self:SetNWInt("BankClient",Bank_DisplayWaiting)
-    end
-end
-
--------------------
 -- NOT IN RADIUS --
--------------------
 function ENT:NotInRadius()  
     for k,v in pairs(player.GetAll()) do
 	    for k,bank in pairs(ReceiverName) do
@@ -257,15 +216,54 @@ function ENT:NotInRadius()
     end
 end
 
-------------------
--- SPAWN SYSTEM --
-------------------
-hook.Add("InitPostEntity","BANK_AUTO_SPAWN",function()
-	for k,bankent in pairs(ents.FindByClass("bankrobbery")) do
-		bankent:Remove()
-	end
+-- SEND DATA --
+function ENT:BankSendData()
+    self:SetNWInt("Bank_StartingAmount",string.Replace(Bank_DisplayAmount,"%BANKAMOUNT%",tostring(Bank_StartingAmount)))
+	if DuringRobbery then
+	    self:SetNWInt("BankClient",string.Replace(Bank_DisplayRobbing,"%ROBBERYTIME%",tostring(Bank_RobberyDTimerReset)))
+	elseif !DuringRobbery && !CanBankRobbery then
+	    self:SetNWInt("BankClient",string.Replace(Bank_DisplayCooldown,"%COOLDOWNTIME%",tostring(Bank_RobberyCTimerReset)))
+    elseif CanBankRobbery then
+	    self:SetNWInt("BankClient",Bank_DisplayWaiting)
+    end
+end
+
+-- SAVE BANK POS --
+concommand.Add("saveBankPos",function()
+    
+	for k,bank in pairs(ents.FindByClass("bankrobbery")) do
+        BankWriteData = {Bank_SpawnPos = bank:GetPos(),Bank_SpawnAngle = bank:GetAngles()}
+	    bank:Remove()
+    end
+	
+	file.CreateDir("bank_robbery_system")
+	file.Write("bank_robbery_system/"..string.lower(game.GetMap())..".txt",util.TableToJSON( BankWriteData ))
+
+	SpawnBankEntity()
+	
+end)
+
+-- SPAWN ENTITY --
+function SpawnBankEntity()
+    
+	if !file.Exists("bank_robbery_system/"..string.lower(game.GetMap())..".txt","DATA") then return end
+	
 	local bank = ents.Create('bankrobbery')
-	bank:SetPos(Bank_SpawnPos)
-	bank:SetAngles(Bank_SpawnAngle)
+	local jtable = util.JSONToTable(file.Read("bank_robbery_system/"..string.lower(game.GetMap())..".txt","DATA"))
+
+	for k,v in pairs(player.GetAll()) do
+	    v:ChatPrint("Bank Robbery System: "..game.GetMap().." position loaded!")
+    end
+	
+    bank:SetPos(jtable.Bank_SpawnPos)
+	bank:SetAngles(jtable.Bank_SpawnAngle)
 	bank:Spawn()
+
+end
+
+-- CALL SPAWN ENTITY --
+hook.Add("InitPostEntity","BankRobberyAutoSpawn",function()
+
+    SpawnBankEntity()
+
 end)

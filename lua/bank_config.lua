@@ -11,8 +11,8 @@ Bank_MinPlayers               = 10 //The minimum players required before being a
 -- Bank Model --
 Bank_ChooseModel              = "models/props/cs_assault/moneypallet.mdl" //Choose the Bank Vault model
 -- Bank Perma Spawn System --
-Bank_SpawnPos                 = Vector(-368.781250, -1559.843750, -143.531250) //Spawn position for the Bank Vault (Console>printEntInfo)
-Bank_SpawnAngle               = Angle(-0.220, -89.868, -0.132) //Spawn Angle for the Bank Vault (Console>printEntInfo)
+//DISABLED! NEW COMMAND ADDED! USE "saveBankPos" TO SAVE THE BANK POSITION (ONLY ONE P/ MAP!). MORE INFORMATION IN THE DESCRIPTION(DARKRP FORUM OR STEAM WORKSHOP OR GITHUB).
+//DISABLED! NEW COMMAND ADDED! USE "saveBankPos" TO SAVE THE BANK POSITION (ONLY ONE P/ MAP!). MORE INFORMATION IN THE DESCRIPTION(DARKRP FORUM OR STEAM WORKSHOP OR GITHUB).
 -- Bank Team Restrict System --
 Bank_TeamCanRob               = { //Who can rob the Bank (Use the team name in-game! Ex: TEAM_MOB = Mob boss) Don't forget the quotes and the commas!
 "Mob boss",
