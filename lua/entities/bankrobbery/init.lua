@@ -229,8 +229,10 @@ function ENT:BankSendData()
 end
 
 -- SAVE BANK POS --
-concommand.Add("saveBankPos",function()
+concommand.Add("saveBankPos",function( ply )
     
+	if !ply:IsSuperAdmin() then return end
+	
 	for k,bank in pairs(ents.FindByClass("bankrobbery")) do
         BankWriteData = {Bank_SpawnPos = bank:GetPos(),Bank_SpawnAngle = bank:GetAngles()}
 	    bank:Remove()

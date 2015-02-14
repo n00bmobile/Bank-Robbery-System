@@ -60,11 +60,3 @@ function ENT:Draw()
    ---------------------------------------------------------------
    
 end
-
-concommand.Add("printEntInfo",function()
-local trace = LocalPlayer():GetEyeTrace()
-if trace.HitNonWorld then
-	print("Vector("..string.Replace(tostring(trace.Entity:GetPos())," ", ", ")..")")
-	print("Angle("..string.Replace(tostring(trace.Entity:GetAngles())," ", ", ")..")")
-end
-end)

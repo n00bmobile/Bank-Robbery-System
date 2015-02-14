@@ -88,6 +88,8 @@ Changes(Feel Free to Report Any Bugs to Me):
 
 -Added translation option in the config file.
 
+-Added saveBankPos command.
+
 Quick Questions:
 
 1.The Robbery fails imediataly after starting it!
