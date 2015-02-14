@@ -8,17 +8,9 @@ Config File:
 
 The Config File is located on the folder called lua, lua can be found on the main folder of the extracted addon. The name of the Config File is bank_config.lua.
 
-Setting up Perma Spawn Location:
+Automatic Bank Vault Spawn:
 
-The Perma Spawn is a system that makes the bank spawn on the map automatically. First we need to get the wanted location for the Perma Spawn System, so the Bank will respawn automatically. Simply spawn one Bank from the Spawn Menu and place it on the wanted location, look directly to it after getting close enought and put printEntInfo on the console.
-
-You'll get two lines with the following:
-
-Vector( xxx, xxx, xxx )
-
-Angle( xxx, xxx, xxx )
-
-Replace the default lines from the Config File with the lines that you just got from the console. When the Config File gets reloaded, the Bank will spawn at his new location.
+Place a Bank Vault Entity and use saveBankPos on the console to save it. If you change to another map, the Bank Vault won't spawn unless you set a position for it too using saveBankPos.
 
 Instructions:
 
@@ -38,7 +30,7 @@ Credits:
 
 n00bmobile (Me)
 
-HunterFP (For helping me with the Perma Spawn System)
+HunterFP (For helping a little)
 
 Planned Updates:
 
