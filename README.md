@@ -29,9 +29,9 @@ This addon is inspired by the Bank Robbery System from Script Fodder. However th
 
 #### Credits: ####
 
-n00bmobile (Me)
+* n00bmobile (Me)
 
-HunterFP (For helping a little)
+* HunterFP (For helping a little)
 
 #### Planned Updates: ####
 * Add money upgrade system based on time.
