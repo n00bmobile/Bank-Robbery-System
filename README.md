@@ -1,42 +1,43 @@
-# Bank Robbery System for DarkRP 2.5+
+Bank Robbery System for DarkRP 2.5+
 ======
 
-### Read Carefully: ###
+##### Read Carefully: #####
 
 This is a Bank Robbery System for DarkRP 2.5+ and it may cause problems when used in others gamemodes.
 
-### Config File: ###
+##### Config File: #####
 
 The Config File is located on the folder called lua, lua can be found on the main folder of the extracted addon. The name of the Config File is bank_config.lua.
 
-### Automatic Bank Vault Spawn: ###
+##### Automatic Bank Vault Spawn: #####
 
 Place a Bank Vault Entity and use saveBankPos on the console to save it. If you change to another map, the Bank Vault won't spawn unless you set a position for it too using saveBankPos.
 
-### Instructions: ###
+##### Instructions: #####
 
 All Instructions needed are located on the Config File.
 Fell free ask me your questions about the Addon.
 
-### Distribution: ###
+##### Distribution: #####
 
 Fell free to edit it as much as you want. Since my code is very simple, you should not have problems to edit it if you know what you're doing. However you cannot edit it and publish it without asking me first. It's clear that also you cannot republish this anywhere else.
 
-### Final Thoughts: ###
+##### Final Thoughts: #####
 
 It took me some time to do this, I really hope that you and your server enjoy it!
 This addon is inspired by the Bank Robbery System from Script Fodder. However this code does not have any connections with it. It's made for free by me.
 
-## Credits: ##
+#### Credits: ####
 
 n00bmobile (Me)
 
 HunterFP (For helping a little)
 
-## Planned Updates: ##
+#### Planned Updates: ####
 * Add money upgrade system based on time.
 
-Changes(Feel Free to Report Any Bugs to Me):
+#### Changes(Feel Free to Report Any Bugs to Me): ####
+
 * Added required cops system.
 * Fixed text not showing money quantity.
 * Fixed problem with perma spawn system.
@@ -62,7 +63,7 @@ Changes(Feel Free to Report Any Bugs to Me):
 * Fixed robbery continuation after being arrested.
 * Added gamemode blocker to evade the use of the Bank Entity on unsupported gamemodes.
 
-### Quick Questions: ###
+##### Quick Questions: #####
 
 1.The Robbery fails imediataly after starting it!
 
