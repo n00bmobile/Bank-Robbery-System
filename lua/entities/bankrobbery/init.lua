@@ -31,6 +31,7 @@ include( "bank_config.lua" )
 -- SPAWN FUNCTION --
 function ENT:SpawnFunction(v,tr)
 if (!tr.Hit) then return end
+if string.lower(gmod.GetGamemode().Name) != "darkrp" then v:ChatPrint("Bank Robbery System: "..gmod.GetGamemode().Name.." is not supported!") return end
 	local Bank_SpawnPos = tr.HitPos + tr.HitNormal * 25
 	local ent = ents.Create(classname)
 	    ent:SetPos(Bank_SpawnPos)
@@ -65,6 +66,8 @@ function ENT:Use(activator,caller)
 	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,string.Replace(Bank_WrongPlayerNumber,"%MINPLAYERS%",tostring(Bank_MinPlayers))) end)
 	elseif !EnoughTeam then
 	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,string.Replace(Bank_WrongCopNumber,"%MINCOPS%",tostring(Bank_RequiredGovernmentNumber))) end)
+	elseif caller:getDarkRPVar("Arrested",true) then
+	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,Bank_WrongArrested) end)
 	elseif !DuringRobbery && !CanBankRobbery then
 	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,string.Replace(Bank_WrongCooldown,"%COOLDOWNTIME%",tostring(Bank_RobberyCTimerReset))) end)
     elseif CanBankRobbery && EnoughTeam then
@@ -75,9 +78,7 @@ function ENT:Use(activator,caller)
 		    SirenLoop()
 			caller:setDarkRPVar("wanted",true)
             caller:setDarkRPVar("wantedReason",Bank_WantedReason)
-	    for k,v in pairs(player.GetAll()) do
-			DarkRP.notify(v,0,5,string.Replace(Bank_StartRobbery,"%PLAYERNAME%",caller:Nick()))
-        end
+	        DarkRP.notifyAll(0,5,string.Replace(Bank_StartRobbery,"%PLAYERNAME%",caller:Nick()))
             self:InRobbery()
 	    end
     end 
@@ -104,15 +105,13 @@ function ENT:InRobbery()
 	timer.Create("BankRobberyCountDown",1,Bank_RobberyTime,function()
 	    Bank_RobberyDTimerReset = Bank_RobberyDTimerReset -1
 	    if Bank_RobberyDTimerReset <= 0 && DuringRobbery then 
-		    for k,v in pairs(player.GetAll()) do
-			    for k,bank in pairs(ReceiverName) do
-				    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(v,0,5,string.Replace(Bank_FinishRobberySucess,"%PLAYERNAME%",bank:Nick())) end)
-				    timer.Create("EvadeSpam",0.1,1,function() bank:addMoney(Bank_StartingAmount) end)
-			    end
-				self:InCooldown()
-			    timer.Destroy("BankRobberyCountDown")
-		    end
-	    end
+		    for k,bank in pairs(ReceiverName) do
+				DarkRP.notifyAll(0,5,string.Replace(Bank_FinishRobberySucess,"%PLAYERNAME%",bank:Nick()))
+				timer.Create("EvadeSpam",0.1,1,function() bank:addMoney(Bank_StartingAmount) end)
+			end
+		    self:InCooldown()
+			timer.Destroy("BankRobberyCountDown")
+		end
     end)
 end
 
@@ -141,6 +140,7 @@ function ENT:Think()
 	    self:NotInRadius()
         self:CheckIfDead()
 	    self:CheckJob()
+		self:CheckIfArrested()
     end
 end
 
@@ -175,13 +175,11 @@ end
 -- CHECK JOB --
 function ENT:CheckJob()
     for k,bank in pairs(ReceiverName) do
-	    for k,v in pairs(player.GetAll()) do
-	        if DuringRobbery && !table.HasValue(Bank_TeamCanRob,team.GetName(bank:Team())) then
-	            DarkRP.notify(v,1,5,string.Replace(Bank_FinishRobberyFailJob,"%PLAYERNAME%",bank:Nick()))
-                self:InCooldown()
-				timer.Destroy("BankRobberyCountDown")
-	        end
-        end
+	    if DuringRobbery && !table.HasValue(Bank_TeamCanRob,team.GetName(bank:Team())) then
+	        DarkRP.notifyAll(1,5,string.Replace(Bank_FinishRobberyFailJob,"%PLAYERNAME%",bank:Nick()))
+            self:InCooldown()
+		    timer.Destroy("BankRobberyCountDown")
+	    end
     end
 end
 
@@ -189,13 +187,11 @@ end
 -- CHECK IF DEAD --
 function ENT:CheckIfDead()
     if DuringRobbery then
-	    for k,v in pairs(player.GetAll()) do
-		    for k,bank in pairs(ReceiverName) do
-                if DuringRobbery && table.HasValue(Bank_TeamCanRob,team.GetName(bank:Team())) && !bank:Alive() then
-			   	    DarkRP.notify(v,1,5,string.Replace(Bank_FinishRobberyFailDie,"%PLAYERNAME%",bank:Nick()))	
-					self:InCooldown()
-					timer.Destroy("BankRobberyCountDown")
-                end
+	    for k,bank in pairs(ReceiverName) do
+            if DuringRobbery && table.HasValue(Bank_TeamCanRob,team.GetName(bank:Team())) && !bank:Alive() then
+			   	DarkRP.notifyAll(1,5,string.Replace(Bank_FinishRobberyFailDie,"%PLAYERNAME%",bank:Nick()))	
+			    self:InCooldown()
+			    timer.Destroy("BankRobberyCountDown")
             end
         end
     end
@@ -203,16 +199,24 @@ end
 
 -- NOT IN RADIUS --
 function ENT:NotInRadius()  
-    for k,v in pairs(player.GetAll()) do
-	    for k,bank in pairs(ReceiverName) do
-	        if DuringRobbery then
-		        if bank:GetPos():Distance(self:GetPos()) >= Bank_RobberyMaxRadius then
-                    self:InCooldown()
-				    DarkRP.notify(v,1,5,string.Replace(Bank_FinishRobberyFailArea,"%PLAYERNAME%",bank:Nick()))
-				    timer.Destroy("BankRobberyCountDown")
-		        end
-            end
+    for k,bank in pairs(ReceiverName) do
+	    if DuringRobbery then
+		    if bank:GetPos():Distance(self:GetPos()) >= Bank_RobberyMaxRadius then
+                self:InCooldown()
+				DarkRP.notifyAll(1,5,string.Replace(Bank_FinishRobberyFailArea,"%PLAYERNAME%",bank:Nick()))
+				timer.Destroy("BankRobberyCountDown")
+		    end
         end
+    end
+end
+
+-- CHECK IF ARRESTED --
+function ENT:CheckIfArrested()
+    for k,bank in pairs(ReceiverName) do
+	    if bank:getDarkRPVar("Arrested",true) then
+	        self:InCooldown()
+		    DarkRP.notifyAll(1,5,string.Replace(Bank_FinishRobberyFailArrested,"%PLAYERNAME%",bank:Nick()))
+		end
     end
 end
 
@@ -248,7 +252,7 @@ end)
 -- SPAWN ENTITY --
 function SpawnBankEntity()
     
-	if !file.Exists("bank_robbery_system/"..string.lower(game.GetMap())..".txt","DATA") then return end
+	if !file.Exists("bank_robbery_system/"..string.lower(game.GetMap())..".txt","DATA") or string.lower(gmod.GetGamemode().Name) != "darkrp" then return end
 	
 	local bank = ents.Create('bankrobbery')
 	local jtable = util.JSONToTable(file.Read("bank_robbery_system/"..string.lower(game.GetMap())..".txt","DATA"))
