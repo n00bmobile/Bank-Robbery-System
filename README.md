@@ -62,6 +62,7 @@ This addon is inspired by the Bank Robbery System from Script Fodder. However th
 * Fixed notifications not showing for everyone.
 * Fixed robbery continuation after being arrested.
 * Added gamemode blocker to evade the use of the Bank Entity on unsupported gamemodes.
+* Robbing and Cooldown time are now in MM:SS format
 
 ##### Quick Questions: #####
 
