@@ -69,7 +69,7 @@ function ENT:Use(activator,caller)
 	elseif caller:getDarkRPVar("Arrested",true) then
 	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,Bank_WrongArrested) end)
 	elseif !DuringRobbery && !CanBankRobbery then
-	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,string.Replace(Bank_WrongCooldown,"%COOLDOWNTIME%",tostring(Bank_RobberyCTimerReset))) end)
+	    timer.Create("EvadeSpam",0.1,1,function() DarkRP.notify(caller,1,5,Bank_WrongCooldown) end)
     elseif CanBankRobbery && EnoughTeam then
 	    if table.HasValue(Bank_TeamCanRob,team.GetName(caller:Team())) then
             DuringRobbery = true
@@ -224,9 +224,9 @@ end
 function ENT:BankSendData()
     self:SetNWInt("Bank_StartingAmount",string.Replace(Bank_DisplayAmount,"%BANKAMOUNT%",tostring(Bank_StartingAmount)))
 	if DuringRobbery then
-	    self:SetNWInt("BankClient",string.Replace(Bank_DisplayRobbing,"%ROBBERYTIME%",tostring(Bank_RobberyDTimerReset)))
+	    self:SetNWInt("BankClient",string.Replace(Bank_DisplayRobbing,"%ROBBERYTIME%",string.ToMinutesSeconds(tostring(Bank_RobberyDTimerReset))))
 	elseif !DuringRobbery && !CanBankRobbery then
-	    self:SetNWInt("BankClient",string.Replace(Bank_DisplayCooldown,"%COOLDOWNTIME%",tostring(Bank_RobberyCTimerReset)))
+	    self:SetNWInt("BankClient",string.Replace(Bank_DisplayCooldown,"%COOLDOWNTIME%",string.ToMinutesSeconds(tostring(Bank_RobberyCTimerReset))))
     elseif CanBankRobbery then
 	    self:SetNWInt("BankClient",Bank_DisplayWaiting)
     end
