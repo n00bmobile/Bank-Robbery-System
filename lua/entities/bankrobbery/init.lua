@@ -235,7 +235,8 @@ end
 -- SAVE BANK POS --
 concommand.Add("saveBankPos",function( ply )
     
-	if !ply:IsSuperAdmin() then return end
+	if !ply:IsSuperAdmin() then ply:ChatPrint("Bank Robbery System: You're not allowed to use this command!") return end
+	if string.lower(gmod.GetGamemode().Name) != "darkrp" then ply:ChatPrint("Bank Robbery System: "..gmod.GetGamemode().Name.." is not supported!") return end
 	
 	for k,bank in pairs(ents.FindByClass("bankrobbery")) do
         BankWriteData = {Bank_SpawnPos = bank:GetPos(),Bank_SpawnAngle = bank:GetAngles()}
