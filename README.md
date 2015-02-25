@@ -35,7 +35,7 @@ This addon is inspired by the Bank Robbery System from Script Fodder. However th
 
 #### Planned Updates: ####
 * Add money upgrade system based on time.
-* 
+* Give money as a reward to the player who killed the robber.
 
 #### Changes(Feel Free to Report Any Bugs to Me): ####
 
