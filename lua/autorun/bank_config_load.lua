@@ -1,7 +1,16 @@
 if SERVER then
+	
 	include("bank_config.lua")
-	print("BankRobbery: Loaded with Success!")
 	AddCSLuaFile("bank_config.lua")
-else
+	
+	include("bank_config_lang.lua")
+	AddCSLuaFile("bank_config_lang.lua")
+
+	MsgN("Bank Robbery System Beta Version 1.6 Loaded")
+
+elseif CLIENT then
+	
 	include("bank_config.lua")
+
 end
+    

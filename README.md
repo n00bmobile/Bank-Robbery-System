@@ -35,36 +35,14 @@ This addon is inspired by the Bank Robbery System from Script Fodder. However th
 
 #### Planned Updates: ####
 * Add money upgrade system based on time.
+* 
 
 #### Changes(Feel Free to Report Any Bugs to Me): ####
 
-* Added required cops system.
-* Fixed text not showing money quantity.
-* Fixed problem with perma spawn system.
-* Fixed infinite robbing, caused by the robbers exiting the server during a robbery.
-* Setting up teams is now a lot easier.
-* Fixed config file missing instructions.
-* Added minimum players system before being able to rob the bank.
-* Added more details to not enough players notification.
-* Fixed duplicated money.
-* Removed money upgrade/downgrade due problems.
-* Not enough players notification now show how many players are needed.
-* Fixed notification spam.
-* Fixed notification spelling mistake.
-* Fixed infinite wanted.
-* New siren sound effect(loop).
-* Removed massive amount of useless things from the code.
-* Fixed infinite siren after bank reload on a running server.
-* Removed useless stuff from the code.
-* Removed bank_reset because of admin abuse.
-* Added translation option in the config file.
-* Added saveBankPos command.
-* Fixed notifications not showing for everyone.
-* Fixed robbery continuation after being arrested.
-* Added gamemode blocker to evade the use of the Bank Entity on unsupported gamemodes.
-* Robbing and Cooldown time are now in MM:SS format.
-* Added warning when someone that it's not an superadmin tries to use saveBankPos.
-* Fixed saveBankPos not getting blocked by the gamemode blocker.
+* REMADE THE BANK FROM SCRATH
+* Added special translation file, contact me to help translate the bank to other languages!
+* Added selectBankLang <desired lang>. Only "en" (English) and "pt_br" (Portuguese) are available for now!
+* Added banker requirement (0 to Disable)
 
 ##### Quick Questions: #####
 
