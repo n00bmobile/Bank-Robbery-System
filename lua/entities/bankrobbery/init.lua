@@ -330,6 +330,8 @@ hook.Add( "InitPostEntity", "BankRobberyLangAutoSetup", BankRobberyLangSetup )
 -- Create Language Command --
 function SelectBankLanguage( ply, cmd, args )
     
+	if !ply:IsSuperAdmin() then ply:ChatPrint( "Bank Robbery System: " ..Bank_NopeSuperadmin ) return end
+	
 	bankWriteData = { Bank_SelectLang = args[1] }
 	
 	file.CreateDir( "bankrobberysystem/config_save" )
