@@ -1,4 +1,13 @@
--- Include Dah Files --
+--------------------------------------------------------------
+-- Don't Touch This Code Unless You Know What You're Doing! --
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+-- Credits ---------------------------------------------------
+--------------------------------------------------------------
+-- n00bmobile.
+
+-- Include Duh Files --
 AddCSLuaFile("shared.lua")
 AddCSLuaFile("cl_init.lua")
 include("shared.lua")
@@ -27,11 +36,12 @@ function ENT:Initialize()
 	local physics = self.Entity:GetPhysicsObject()
 	    
 	if physics:IsValid() then
+		
 		physics:Sleep()
 	    physics:EnableMotion( false )
+	
 	end
 	
-
 end
 
 -- Spawn Duh Bank --
@@ -41,7 +51,7 @@ function ENT:SpawnFunction(v,tr)
 	
 	if string.lower( gmod.GetGamemode().Name ) != "darkrp" then 
 	    
-		v:ChatPrint("Bank Robbery System: "..gmod.GetGamemode().Name.." is not supported!") 
+		v:ChatPrint( "Bank Robbery System: " ..string.Replace( Bank_GMNotSuported, "%GAMEMODE%", gmod.GetGamemode().Name ) ) 
 	
 	return end
 	
@@ -54,7 +64,9 @@ function ENT:SpawnFunction(v,tr)
 	bank:Activate()
         
     if ShouldSetOwner then
+		
 		bank.Owner = v
+	
 	end
 	    
         return bank
@@ -83,10 +95,12 @@ function ENT:AcceptInput( ply, caller )
 	    elseif duringRobbery then DarkRP.notify( caller, 1, 5, Bank_WrongRobbery )
         
 	    elseif caller:IsPlayer() then
-	        haveRequiredCops = false
+	        
+			haveRequiredCops = false
 			haveRequiredBankers = false
 			self:RobberyCountdown( caller )
 			self:BankSirenLoop()
+		
 		end		
 
     end)
@@ -102,21 +116,29 @@ function RequirementCheck( caller )
 	for k,v in pairs(player.GetAll()) do
 	    
 		if table.HasValue( Bank_SetNeededTeam, team.GetName( v:Team() ) ) then
-		    countTeam = countTeam +1
+		    
+			countTeam = countTeam +1
+		
 		end
 	    
 	    if table.HasValue( Bank_SetTeamBanker, team.GetName( v:Team() ) ) then
-		    countBanker = countBanker +1
+		    
+			countBanker = countBanker +1
+		
 		end
 	    
 	end
 
 	if countTeam >= Bank_SetTeamMinNum then
+		
 		haveRequiredCops = true
+	
 	end
 	
 	if countBanker >= Bank_SetBankerMinNum then
-        haveRequiredBankers = true
+        
+		haveRequiredBankers = true
+	
 	end
 
 end
@@ -161,13 +183,16 @@ function ENT:RobberyCountdown( caller )
 		bankRobTimer = bankRobTimer -1
 		
 		if bankRobTimer <= 0 then
-		    RobberySucess( caller )
+		    
+			RobberySucess( caller )
+		
 		end
     
 	end)
 
 end
 
+-- Scream Bank Getting Robbed Near The Cops --
 function ENT:BankSirenLoop()
     
 	BroadcastLua('surface.PlaySound("sirenloud.wav")')
@@ -205,8 +230,10 @@ function RobberyCooldown()
 		bankCooldownTimer = bankCooldownTimer -1
 		
 		if bankCooldownTimer <= 0 then
-		    duringCooldown = false
-	    end
+		    
+			duringCooldown = false
+	    
+		end
 	
 	end)
 
@@ -239,14 +266,16 @@ end
 -- Spawn Duh Bank Automatically --
 function SpawnBankRobberyAuto()
     
-	if !file.Exists( "bank_robbery_system/" ..string.lower( game.GetMap() ).. ".txt", "DATA" ) || string.lower( gmod.GetGamemode().Name ) != "darkrp" then return end
+	if !file.Exists( "bankrobberysystem/autospawn/" ..string.lower( game.GetMap() ).. ".txt", "DATA" ) || string.lower( gmod.GetGamemode().Name ) != "darkrp" then return end
 	
 	local bank = ents.Create( "bankrobbery" )
-	local tab = util.JSONToTable( file.Read( "bank_robbery_system/" ..string.lower(game.GetMap()).. ".txt", "DATA" ))
+	local tab = util.JSONToTable( file.Read( "bankrobberysystem/autospawn/" ..string.lower(game.GetMap()).. ".txt", "DATA" ))
 
 	for k, v in pairs( player.GetAll() ) do
-	    v:ChatPrint( "Bank Robbery System: "..game.GetMap().." position loaded!" )
-    end
+	    
+		v:ChatPrint( "Bank Robbery System: " ..string.Replace( Bank_MapPosLoaded, "%MAPNAME%", game.GetMap() ) )
+    
+	end
 	
     bank:SetPos( tab.Bank_SpawnPos )
 	bank:SetAngles( tab.Bank_SpawnAngle )
@@ -256,33 +285,36 @@ end
 hook.Add( "InitPostEntity", "BankRobberyAutoSpawn", SpawnBankRobberyAuto )
 
 -- Save Duh Bank Pos --
-concommand.Add( "saveBankPos", function( ply )
+function SaveBankPos( ply )
     
-	if !ply:IsSuperAdmin() then ply:ChatPrint( "Bank Robbery System: You need to be a superadmin to run this command!" ) return end
+	if !ply:IsSuperAdmin() then ply:ChatPrint( "Bank Robbery System: " ..Bank_NopeSuperadmin ) return end
 	
-	if string.lower( gmod.GetGamemode().Name ) != "darkrp" then ply:ChatPrint( "Bank Robbery System: "..gmod.GetGamemode().Name.." is not supported!" ) return end
+	if string.lower( gmod.GetGamemode().Name ) != "darkrp" then ply:ChatPrint( "Bank Robbery System: " ..string.Replace( Bank_GMNotSuported, "%GAMEMODE%", gmod.GetGamemode().Name ) ) return end
 	
 	for k,bank in pairs( ents.FindByClass( "bankrobbery" ) ) do
-        bankWriteData = { Bank_SpawnPos = bank:GetPos(), Bank_SpawnAngle = bank:GetAngles()}
+        
+		bankWriteData = { Bank_SpawnPos = bank:GetPos(), Bank_SpawnAngle = bank:GetAngles()}
 	    bank:Remove()
-    end
+    
+	end
 	
-	file.CreateDir( "bank_robbery_system" )
-	file.Write( "bank_robbery_system/" ..string.lower( game.GetMap() ).. ".txt", util.TableToJSON( bankWriteData ) )
+	file.CreateDir( "bankrobberysystem/autospawn" )
+	file.Write( "bankrobberysystem/autospawn/" ..string.lower( game.GetMap() ).. ".txt", util.TableToJSON( bankWriteData ) )
 
 	SpawnBankRobberyAuto()
 	
-end)
+end
+concommand.Add( "saveBankPos", SaveBankPos )
 
 -- Choose Duh Language --
 function BankRobberyLangSetup()
     
-	if !file.Exists( "bank_robbery_system/bank_config_save.txt", "DATA" ) then 
+	if !file.Exists( "bankrobberysystem/config_save/saved_lang.txt", "DATA" ) then 
 	
 	    bankWriteData = { Bank_SelectLang = "en" }
 		
-		file.CreateDir( "bank_robbery_system" )
-		file.Write( "bank_robbery_system/bank_config_save.txt", util.TableToJSON( bankWriteData ) )
+		file.CreateDir( "bankrobberysystem/config_save" )
+		file.Write( "bankrobberysystem/config_save/saved_lang.txt", util.TableToJSON( bankWriteData ) )
 	
 	    BankLang()
 	
@@ -295,14 +327,15 @@ function BankRobberyLangSetup()
 end
 hook.Add( "InitPostEntity", "BankRobberyLangAutoSetup", BankRobberyLangSetup )
 
--- Create Duh Command --
-concommand.Add( "selectBankLang", function( ply, cmd, args )
+-- Create Language Command --
+function SelectBankLanguage( ply, cmd, args )
     
 	bankWriteData = { Bank_SelectLang = args[1] }
 	
-	file.CreateDir( "bank_robbery_system" )
-	file.Write( "bank_robbery_system/bank_config_save.txt", util.TableToJSON( bankWriteData ) )
+	file.CreateDir( "bankrobberysystem/config_save" )
+	file.Write( "bankrobberysystem/config_save/saved_lang.txt", util.TableToJSON( bankWriteData ) )
 	
 	BankLang()
 	  
-end)
+end
+concommand.Add( "selectBankLang", SelectBankLanguage )

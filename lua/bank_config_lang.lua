@@ -3,11 +3,11 @@
 ----------------------------------------------------------------------------------
 function BankLang() //Use "selectBankLang <desired lang>" to enable "pt_br" or other available languages. The default language is "en".
     
-	local tab = util.JSONToTable( file.Read( "bank_robbery_system/bank_config_save.txt", "DATA" ) )
+	local tab = util.JSONToTable( file.Read( "bankrobberysystem/config_save/saved_lang.txt", "DATA" ) )
 	
 	if tab.Bank_SelectLang == "en" then
 	    
-		MsgN("Bank Robbery System: English by n00bmobile has been selected!")
+		MsgN("Bank Robbery System: English by n00bmobile selected!")
 		
 	    -- Personal Error Messages --
         Bank_WrongTeam = "You cannot start a robbery as a %PLAYERTEAM%!"
@@ -30,10 +30,15 @@ function BankLang() //Use "selectBankLang <desired lang>" to enable "pt_br" or o
         Bank_DisplayCooldown = "Cooldown: %COOLDOWNTIMER%"
 	    Bank_DisplayReady = "Ready"
 		Bank_DisplayVault = "Bank Vault"
+		-- Bank General Notifications --
+		Bank_GMNotSuported = "%GAMEMODE% is not supported!"
+		Bank_MapPosLoaded = "%MAPNAME% position loaded!"
+		Bank_NopeSuperadmin = "You need to be a superadmin to run this command!"
+		
 
 	elseif tab.Bank_SelectLang == "pt_br" then
 	    
-		MsgN("Bank Robbery System: Portuguese by n00bmobile has been selected!")
+		MsgN("Bank Robbery System: Brazilian Portuguese by n00bmobile selected!")
 		
 		-- Personal Error Messages --
 	    Bank_WrongTeam = "Você não pode roubar como um %PLAYERTEAM%!"
@@ -56,11 +61,15 @@ function BankLang() //Use "selectBankLang <desired lang>" to enable "pt_br" or o
 	    Bank_DisplayCooldown = "Recarregando: %COOLDOWNTIMER%"
 	    Bank_DisplayReady = "Pronto"
 		Bank_DisplayVault = "Cofre do Banco"
+		-- Bank General Notifications --
+		Bank_GMNotSuported = "%GAMEMODE% não é suportado!"
+		Bank_MapPosLoaded = "Carregada a posição de %MAPNAME%!"
+		Bank_NopeSuperadmin = "Você precisa ser um super administrador para executar esse comando!"
 	
 	else
 	    
 		MsgN("Bank Robbery System: This language isn't valid, the save file has been removed!")
-		file.Delete( "bank_robbery_system/bank_config_save.txt" )
+		file.Delete( "bankrobberysystem/config_save/saved_lang.txt" )
 		
 	end
 	

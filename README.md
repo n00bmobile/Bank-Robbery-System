@@ -41,6 +41,7 @@ This addon is inspired by the Bank Robbery System from Script Fodder. However th
 * Added special translation file, contact me to help translate the bank to other languages!
 * Added selectBankLang <desired lang>. Only "en" (English) and "pt_br" (Portuguese) are available for now!
 * Added banker requirement (0 to Disable)
+* Added more configuration options.
 
 ##### Quick Questions: #####
 
