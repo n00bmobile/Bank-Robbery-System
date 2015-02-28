@@ -174,7 +174,7 @@ function ENT:RobberyCountdown( caller )
     
 	bankRobTimer = Bank_SetRobTime
 	duringRobbery = true
-	DarkRP.notifyAll( 1, 5, string.Replace( Bank_RobberyStarted, "%PLAYERNAME%", caller:Nick() ) )
+	DarkRP.notifyAll( 0, 5, string.Replace( Bank_RobberyStarted, "%PLAYERNAME%", caller:Nick() ) )
 	
 	timer.Create( "RobberyCountdown", 1, Bank_SetRobTime, function()
 	    
@@ -210,7 +210,7 @@ end
 -- Noob It's Now A Master --
 function RobberySucess( caller )
     
-	DarkRP.notifyAll( 1, 5, string.Replace( Bank_RobberyFinished, "%PLAYERNAME%", caller:Nick() ) )
+	DarkRP.notifyAll( 0, 5, string.Replace( Bank_RobberyFinished, "%PLAYERNAME%", caller:Nick() ) )
 	caller:addMoney( Bank_SetMoneyAmount )
 	RobberyCooldown()
 
