@@ -8,11 +8,11 @@
 -- n00bmobile.
 
 -- Include Duh Files --
-AddCSLuaFile("shared.lua")
-AddCSLuaFile("cl_init.lua")
-include("shared.lua")
-include("bank_config.lua")
-include("bank_config_lang.lua")
+AddCSLuaFile( "shared.lua" )
+AddCSLuaFile( "cl_init.lua" )
+include( "shared.lua" )
+include( "bank_config.lua" )
+include( "bank_config_lang.lua" )
 
 -- Needed For More Than One Function --
 local bankRobTimer = Bank_SetRobTime
@@ -22,8 +22,9 @@ local haveRequiredBankers = false
 local duringRobbery = false
 local duringCooldown = false
 
--- Precache Some Shit --
+-- Do Some Shit --
 util.PrecacheSound( "soundloud.wav" )
+resource.AddFile( "soundloud.wav" )
 
 -- Inicialize Duh Bank --
 function ENT:Initialize()
@@ -51,7 +52,7 @@ function ENT:SpawnFunction(v,tr)
 	
 	if string.lower( gmod.GetGamemode().Name ) != "darkrp" then 
 	    
-		v:ChatPrint( "Bank Robbery System: " ..string.Replace( Bank_GMNotSuported, "%GAMEMODE%", gmod.GetGamemode().Name ) ) 
+		v:ChatPrint( "[Bank Robbery System]: " ..string.Replace( Bank_GMNotSuported, "%GAMEMODE%", gmod.GetGamemode().Name ) ) 
 	
 	return end
 	
@@ -249,19 +250,45 @@ end
 -- Send Lazy NWInts With The Bank Status --
 function ENT:SendBankStatusClient()
     
-	self:SetNWInt( "BankVault", Bank_DisplayVault ) //I can't run the bank_config_lang.lua clientside.
+	self:SetNWString( "BankVault", Bank_DisplayVault ) //I can't run the bank_config_lang.lua clientside.
 	
 	if duringRobbery then
-	    self:SetNWInt( "BankStatus", string.Replace( Bank_DisplayRobbing, "%ROBBINGTIMER%", string.ToMinutesSeconds( bankRobTimer ) ) )
+	    self:SetNWString( "BankStatus", string.Replace( Bank_DisplayRobbing, "%ROBBINGTIMER%", string.ToMinutesSeconds( bankRobTimer ) ) )
 	
 	elseif duringCooldown then
-	    self:SetNWInt( "BankStatus", string.Replace( Bank_DisplayCooldown, "%COOLDOWNTIMER%", string.ToMinutesSeconds( bankCooldownTimer ) ) )
+	    self:SetNWString( "BankStatus", string.Replace( Bank_DisplayCooldown, "%COOLDOWNTIMER%", string.ToMinutesSeconds( bankCooldownTimer ) ) )
     
 	elseif !duringRobbery && !duringCooldown then
-	    self:SetNWInt( "BankStatus", Bank_DisplayReady )
+	    self:SetNWString( "BankStatus", Bank_DisplayReady )
     end
 
 end
+
+-- Check For Updates --
+function BankCheckForUpdate()
+
+    http.Fetch( "https://dl.dropboxusercontent.com/s/90pfxdcg0mtbumu/bankVersion.txt", 
+	    
+		function( body )   
+	        
+	        if body > "1.6.1" then 
+			    
+				PrintMessage( HUD_PRINTTALK, "[Bank Robbery System]: This server is using an outdated version of the Bank Robbery System!" )
+
+			end
+		
+		end,
+	 
+        function( error )
+		
+		    PrintMessage( HUD_PRINTTALK, "[Bank Robbery System]: An error has occured while looking for updates, check your internet connection!" )
+		
+	    end
+	
+	)
+
+end
+hook.Add( "PlayerInitialSpawn", "BankCheckForUpdate", BankCheckForUpdate )
 
 -- Spawn Duh Bank Automatically --
 function SpawnBankRobberyAuto()
@@ -273,7 +300,7 @@ function SpawnBankRobberyAuto()
 
 	for k, v in pairs( player.GetAll() ) do
 	    
-		v:ChatPrint( "Bank Robbery System: " ..string.Replace( Bank_MapPosLoaded, "%MAPNAME%", game.GetMap() ) )
+		v:ChatPrint( "[[Bank Robbery System]]: " ..string.Replace( Bank_MapPosLoaded, "%MAPNAME%", game.GetMap() ) )
     
 	end
 	
@@ -287,9 +314,9 @@ hook.Add( "InitPostEntity", "BankRobberyAutoSpawn", SpawnBankRobberyAuto )
 -- Save Duh Bank Pos --
 function SaveBankPos( ply )
     
-	if !ply:IsSuperAdmin() then ply:ChatPrint( "Bank Robbery System: " ..Bank_NopeSuperadmin ) return end
+	if !ply:IsSuperAdmin() then ply:ChatPrint( "[Bank Robbery System]: " ..Bank_NopeSuperadmin ) return end
 	
-	if string.lower( gmod.GetGamemode().Name ) != "darkrp" then ply:ChatPrint( "Bank Robbery System: " ..string.Replace( Bank_GMNotSuported, "%GAMEMODE%", gmod.GetGamemode().Name ) ) return end
+	if string.lower( gmod.GetGamemode().Name ) != "darkrp" then ply:ChatPrint( "[Bank Robbery System]: " ..string.Replace( Bank_GMNotSuported, "%GAMEMODE%", gmod.GetGamemode().Name ) ) return end
 	
 	for k,bank in pairs( ents.FindByClass( "bankrobbery" ) ) do
         
@@ -330,7 +357,7 @@ hook.Add( "InitPostEntity", "BankRobberyLangAutoSetup", BankRobberyLangSetup )
 -- Create Language Command --
 function SelectBankLanguage( ply, cmd, args )
     
-	if !ply:IsSuperAdmin() then ply:ChatPrint( "Bank Robbery System: " ..Bank_NopeSuperadmin ) return end
+	if !ply:IsSuperAdmin() then ply:ChatPrint( "[Bank Robbery System]: " ..Bank_NopeSuperadmin ) return end
 	
 	bankWriteData = { Bank_SelectLang = args[1] }
 	
