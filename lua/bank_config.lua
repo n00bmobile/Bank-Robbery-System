@@ -8,7 +8,7 @@ Bank_SetCooldownTime = 600 //The amount of time that you need to wait before you
 Bank_SetTeamMinNum = 5 //Minimum number of teams considered cops by the bank needed to start a robbery (0 to disable).
 Bank_SetPlayerMinNum = 10 //Minimum of players needed to start a robbery (0 to disable).
 Bank_SetMaxRadius = 500 //The maximum distance that you can go from the bank during a robbery.
-Bank_SetBankerMinNum = 1 //Minimum number of teams considered bankers by the bank needed to start a robbery (o to disable).
+Bank_SetBankerMinNum = 0 //Minimum number of teams considered bankers by the bank needed to start a robbery (o to disable).
 Bank_SetSirenSoundLoop = true //Define if the siren when robbing the bank should loop.
 -- Restrict Team Settings --
 Bank_SetTeamBanker = { //The teams considered bankers by the bank.

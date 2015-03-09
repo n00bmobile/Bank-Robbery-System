@@ -147,7 +147,11 @@ end
 -- Check For Noobs --
 function ENT:CheckForFail( caller )
     
-	if !caller:Alive() then
+	if !IsValid( caller ) then 
+	    RobberyCooldown()
+		timer.Destroy( "RobberyCountdown" )
+	
+	elseif !caller:Alive() then
 	    DarkRP.notifyAll( 1, 5, string.Replace( Bank_FailDied, "%PLAYERNAME%", caller:Nick() ) )
         RobberyCooldown()
 		timer.Destroy( "RobberyCountdown" )
@@ -156,7 +160,7 @@ function ENT:CheckForFail( caller )
 	    DarkRP.notifyAll( 1, 5, string.Replace( Bank_FailChanged, "%PLAYERNAME%", caller:Nick() ) )
         RobberyCooldown()
 		timer.Destroy( "RobberyCountdown" )
-	
+    
 	elseif caller:getDarkRPVar( "Arrested", true ) then
 	    DarkRP.notifyAll( 1, 5, string.Replace( Bank_FailArrested, "%PLAYERNAME%", caller:Nick() ) )
         RobberyCooldown()
@@ -271,7 +275,7 @@ function BankCheckForUpdate()
 	    
 		function( body )   
 	        
-	        if body > "1.6.1" then 
+	        if body > "1.6.2" then 
 			    
 				PrintMessage( HUD_PRINTTALK, "[Bank Robbery System]: This server is using an outdated version of the Bank Robbery System!" )
 
