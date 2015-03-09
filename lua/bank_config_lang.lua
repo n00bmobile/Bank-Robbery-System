@@ -7,7 +7,7 @@ function BankLang() //Use "selectBankLang <desired lang>" to enable "pt_br" or o
 	
 	if tab.Bank_SelectLang == "en" then
 	    
-		MsgN("Bank Robbery System: English by n00bmobile selected!")
+		PrintMessage( HUD_PRINTTALK, "[Bank Robbery System]: English by n00bmobile selected!" )
 		
 	    -- Personal Error Messages --
         Bank_WrongTeam = "You cannot start a robbery as a %PLAYERTEAM%!"
@@ -38,7 +38,7 @@ function BankLang() //Use "selectBankLang <desired lang>" to enable "pt_br" or o
 
 	elseif tab.Bank_SelectLang == "pt_br" then
 	    
-		MsgN("Bank Robbery System: Brazilian Portuguese by n00bmobile selected!")
+		PrintMessage( HUD_PRINTTALK, "[Bank Robbery System]: Brazilian Portuguese by n00bmobile selected!" )
 		
 		-- Personal Error Messages --
 	    Bank_WrongTeam = "Você não pode roubar como um %PLAYERTEAM%!"
@@ -68,7 +68,7 @@ function BankLang() //Use "selectBankLang <desired lang>" to enable "pt_br" or o
 	
 	else
 	    
-		MsgN("Bank Robbery System: This language isn't valid, the save file has been removed!")
+		PrintMessage( HUD_PRINTTALK, "[Bank Robbery System]: This language isn't valid, the save file has been removed!" )
 		file.Delete( "bankrobberysystem/config_save/saved_lang.txt" )
 		
 	end
