@@ -1,6 +1,9 @@
 include("shared.lua")
 include("bank_config.lua")
 
+local BankVault = "ERROR :("
+local BankStatus = "RESPAWN THE BANK"
+
 function ENT:Initialize()
 	
 	self.Color = Color( 255, 255, 255, 255 )
@@ -28,14 +31,14 @@ function ENT:Draw()
    ang1:RotateAroundAxis( ang1:Up(), 0  )
 
    cam.Start3D2D( pos, ang, 1 )
-        draw.DrawText( self:GetNWString("BankVault"), "Default", 0, -100, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER )
-        draw.DrawText( self:GetNWString("BankStatus"), "Default", 0, -90, Color( 255, 9, 9, 237 ), TEXT_ALIGN_CENTER )
+        draw.DrawText( BankVault, "Default", 0, -100, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER )
+        draw.DrawText( BankStatus, "Default", 0, -90, Color( 255, 9, 9, 237 ), TEXT_ALIGN_CENTER )
         draw.DrawText("$" ..Bank_SetMoneyAmount, "Default", 0, -80, Color( 20, 150, 20, 255 ), TEXT_ALIGN_CENTER )
    cam.End3D2D()
    
    cam.Start3D2D( pos1, ang1, 1 )
-        draw.DrawText( self:GetNWString("BankVault"), "Default", 0, -100, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER )
-        draw.DrawText( self:GetNWString("BankStatus"), "Default", 0, -90, Color( 255, 9, 9, 237 ), TEXT_ALIGN_CENTER )
+        draw.DrawText( BankVault, "Default", 0, -100, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER )
+        draw.DrawText( BankStatus, "Default", 0, -90, Color( 255, 9, 9, 237 ), TEXT_ALIGN_CENTER )
         draw.DrawText( "$" ..Bank_SetMoneyAmount, "Default", 0, -80, Color( 20, 150, 20, 255 ), TEXT_ALIGN_CENTER )   
    cam.End3D2D()
 
@@ -45,3 +48,9 @@ function ENT:Draw()
    self.lasttime = SysTime()
 
 end
+
+function BankStatusUpdate()
+    BankVault = net.ReadString()
+    BankStatus = net.ReadString()
+end
+net.Receive("DisplayUpdate", BankStatusUpdate)

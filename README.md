@@ -44,6 +44,8 @@ This addon is inspired by the Bank Robbery System from Script Fodder. However th
 * Added more configuration options.
 * Added support for new garry's mod version.
 * Added update checker.
+* French added.
+* Optimized a little.
 
 ##### Quick Questions: #####
 

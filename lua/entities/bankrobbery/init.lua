@@ -23,8 +23,9 @@ local duringRobbery = false
 local duringCooldown = false
 
 -- Do Some Shit --
+util.AddNetworkString( "DisplayUpdate" )
 util.PrecacheSound( "soundloud.wav" )
-resource.AddFile( "soundloud.wav" )
+resource.AddFile( "sound/soundloud.wav" )
 
 -- Inicialize Duh Bank --
 function ENT:Initialize()
@@ -34,8 +35,10 @@ function ENT:Initialize()
 	self.Entity:SetMoveType( SOLID_VPHYSICS )
 	self.Entity:PhysicsInit( SOLID_VPHYSICS )
 	
+	BankUpdateDisplay( Bank_DisplayReady ) 
+	
 	local physics = self.Entity:GetPhysicsObject()
-	    
+	   
 	if physics:IsValid() then
 		
 		physics:Sleep()
@@ -63,7 +66,7 @@ function ENT:SpawnFunction(v,tr)
 	bank:SetPos( bank_spawn )
 	bank:Spawn()
 	bank:Activate()
-        
+       
     if ShouldSetOwner then
 		
 		bank.Owner = v
@@ -183,6 +186,7 @@ function ENT:RobberyCountdown( caller )
 	
 	timer.Create( "RobberyCountdown", 1, Bank_SetRobTime, function()
 	    
+		BankUpdateDisplay( string.Replace( Bank_DisplayRobbing, "%ROBBINGTIMER%", string.ToMinutesSeconds( bankRobTimer ) ) )
 		self:CheckForFail( caller )
 		
 		bankRobTimer = bankRobTimer -1
@@ -232,10 +236,14 @@ function RobberyCooldown()
 	
 	timer.Create( "RobberyCooldown", 1, Bank_SetCooldownTime, function()
 	    
+		BankUpdateDisplay( string.Replace( Bank_DisplayCooldown, "%COOLDOWNTIMER%", string.ToMinutesSeconds( bankCooldownTimer ) ) )
+		
 		bankCooldownTimer = bankCooldownTimer -1
 		
 		if bankCooldownTimer <= 0 then
 		    
+			BankUpdateDisplay( Bank_DisplayReady )
+			
 			duringCooldown = false
 	    
 		end
@@ -244,28 +252,11 @@ function RobberyCooldown()
 
 end
 
--- Think To Send Lazy NWInts --
-function ENT:Think()
-    
-	self:SendBankStatusClient()
-    
-end
-
--- Send Lazy NWInts With The Bank Status --
-function ENT:SendBankStatusClient()
-    
-	self:SetNWString( "BankVault", Bank_DisplayVault ) //I can't run the bank_config_lang.lua clientside.
-	
-	if duringRobbery then
-	    self:SetNWString( "BankStatus", string.Replace( Bank_DisplayRobbing, "%ROBBINGTIMER%", string.ToMinutesSeconds( bankRobTimer ) ) )
-	
-	elseif duringCooldown then
-	    self:SetNWString( "BankStatus", string.Replace( Bank_DisplayCooldown, "%COOLDOWNTIMER%", string.ToMinutesSeconds( bankCooldownTimer ) ) )
-    
-	elseif !duringRobbery && !duringCooldown then
-	    self:SetNWString( "BankStatus", Bank_DisplayReady )
-    end
-
+function BankUpdateDisplay( text )
+    net.Start( "DisplayUpdate" )
+	    net.WriteString( Bank_DisplayVault )
+		net.WriteString( text )
+	net.Broadcast()
 end
 
 -- Check For Updates --
@@ -275,7 +266,7 @@ function BankCheckForUpdate()
 	    
 		function( body )   
 	        
-	        if body > "1.6.2" then 
+	        if body > "1.6.3" then 
 			    
 				PrintMessage( HUD_PRINTTALK, "[Bank Robbery System]: This server is using an outdated version of the Bank Robbery System!" )
 
@@ -304,7 +295,7 @@ function SpawnBankRobberyAuto()
 
 	for k, v in pairs( player.GetAll() ) do
 	    
-		v:ChatPrint( "[[Bank Robbery System]]: " ..string.Replace( Bank_MapPosLoaded, "%MAPNAME%", game.GetMap() ) )
+		v:ChatPrint( "[Bank Robbery System]: " ..string.Replace( Bank_MapPosLoaded, "%MAPNAME%", game.GetMap() ) )
     
 	end
 	
@@ -341,11 +332,9 @@ concommand.Add( "saveBankPos", SaveBankPos )
 function BankRobberyLangSetup()
     
 	if !file.Exists( "bankrobberysystem/config_save/saved_lang.txt", "DATA" ) then 
-	
-	    bankWriteData = { Bank_SelectLang = "en" }
-		
+	    
 		file.CreateDir( "bankrobberysystem/config_save" )
-		file.Write( "bankrobberysystem/config_save/saved_lang.txt", util.TableToJSON( bankWriteData ) )
+		file.Write( "bankrobberysystem/config_save/saved_lang.txt", "en" )
 	
 	    BankLang()
 	
@@ -363,12 +352,11 @@ function SelectBankLanguage( ply, cmd, args )
     
 	if !ply:IsSuperAdmin() then ply:ChatPrint( "[Bank Robbery System]: " ..Bank_NopeSuperadmin ) return end
 	
-	bankWriteData = { Bank_SelectLang = args[1] }
-	
 	file.CreateDir( "bankrobberysystem/config_save" )
-	file.Write( "bankrobberysystem/config_save/saved_lang.txt", util.TableToJSON( bankWriteData ) )
+	file.Write( "bankrobberysystem/config_save/saved_lang.txt", args[1] )
 	
 	BankLang()
+	BankUpdateDisplay( Bank_DisplayReady )
 	  
 end
 concommand.Add( "selectBankLang", SelectBankLanguage )
