@@ -30,6 +30,7 @@ This addon is inspired by the Bank Robbery System from Script Fodder. However th
 #### Credits: ####
 
 * n00bmobile
+* MrStrix For Translating The Bank To French
 
 #### Planned Updates: ####
 * Add money upgrade system based on time.
