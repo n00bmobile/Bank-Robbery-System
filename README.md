@@ -47,6 +47,8 @@ This addon is inspired by the Bank Robbery System from Script Fodder. However th
 * Added update checker.
 * French added.
 * Optimized a little.
+* Fixed issue with automatic spawn system.
+* Fixed issue with translation system.
 
 ##### Quick Questions: #####
 

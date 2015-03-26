@@ -1,8 +1,8 @@
 include("shared.lua")
 include("bank_config.lua")
 
-local BankVault = "ERROR :("
-local BankStatus = "RESPAWN THE BANK"
+local BankVault = "Bank Vault"
+local BankStatus = "Ready"
 
 function ENT:Initialize()
 	

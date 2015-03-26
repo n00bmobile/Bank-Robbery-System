@@ -15,12 +15,8 @@ include( "bank_config.lua" )
 include( "bank_config_lang.lua" )
 
 -- Needed For More Than One Function --
-local bankRobTimer = Bank_SetRobTime
-local bankCooldownTimer = Bank_SetCooldownTime
 local haveRequiredCops = false
 local haveRequiredBankers = false
-local duringRobbery = false
-local duringCooldown = false
 
 -- Do Some Shit --
 util.AddNetworkString( "Bank_DisplayUpdate" )
@@ -34,9 +30,7 @@ function ENT:Initialize()
 	self.Entity:SetSolid( SOLID_VPHYSICS )
 	self.Entity:SetMoveType( SOLID_VPHYSICS )
 	self.Entity:PhysicsInit( SOLID_VPHYSICS )
-	
-	BankUpdateDisplay( Bank_DisplayReady ) 
-	
+
 	local physics = self.Entity:GetPhysicsObject()
 	   
 	if physics:IsValid() then
@@ -45,7 +39,7 @@ function ENT:Initialize()
 	    physics:EnableMotion( false )
 	
 	end
-	
+		
 end
 
 -- Spawn Duh Bank --
@@ -66,7 +60,7 @@ function ENT:SpawnFunction(v,tr)
 	bank:SetPos( bank_spawn )
 	bank:Spawn()
 	bank:Activate()
-       
+
     if ShouldSetOwner then
 		
 		bank.Owner = v
@@ -84,21 +78,49 @@ function ENT:AcceptInput( ply, caller )
 	
 	    RequirementCheck( caller )
 	
-	    if !table.HasValue( Bank_SetCanRobTeam, team.GetName(  caller:Team() ) ) then DarkRP.notify( caller, 1, 5, string.Replace( Bank_WrongTeam, "%PLAYERTEAM%", team.GetName( caller:Team() ) ) )
-	
-	    elseif caller:getDarkRPVar( "Arrested", true ) then DarkRP.notify( caller, 1, 5, Bank_WrongArrested )
+	    if !table.HasValue( Bank_SetCanRobTeam, team.GetName(  caller:Team() ) ) then 
+		    
+			DarkRP.notify( caller, 1, 5, string.Replace( Bank_WrongTeam, "%PLAYERTEAM%", team.GetName( caller:Team() ) ) )
 	    
-		elseif #player.GetAll() < Bank_SetPlayerMinNum then DarkRP.notify( caller, 1, 5, string.Replace( Bank_WrongPlayer, "%MINPLAYERS%", tostring( Bank_SetPlayerMinNum ) ) ) 
+		return end
 	
-	    elseif !haveRequiredCops then DarkRP.notify( caller, 1, 5, string.Replace( Bank_WrongCop, "%MINCOPS%", tostring( Bank_SetTeamMinNum ) ) )
+	    if caller:getDarkRPVar( "Arrested", true ) then 
+		    
+			DarkRP.notify( caller, 1, 5, Bank_WrongArrested )
+			
+		return end
+	    
+		if #player.GetAll() < Bank_SetPlayerMinNum then 
 		
-		elseif !haveRequiredBankers then DarkRP.notify( caller, 1, 5, string.Replace( Bank_WrongBanker, "%MINBANKERS%", tostring( Bank_SetBankerMinNum ) ) )
-	
-	    elseif duringCooldown then DarkRP.notify( caller, 1, 5, Bank_WrongCooldown )
-	   
-	    elseif duringRobbery then DarkRP.notify( caller, 1, 5, Bank_WrongRobbery )
+		    DarkRP.notify( caller, 1, 5, string.Replace( Bank_WrongPlayer, "%MINPLAYERS%", tostring( Bank_SetPlayerMinNum ) ) ) 
         
-	    elseif caller:IsPlayer() then
+        return end
+		
+	    if !haveRequiredCops then 
+		
+		    DarkRP.notify( caller, 1, 5, string.Replace( Bank_WrongCop, "%MINCOPS%", tostring( Bank_SetTeamMinNum ) ) )
+		
+		return end
+		
+		if !haveRequiredBankers then 
+		    
+			DarkRP.notify( caller, 1, 5, string.Replace( Bank_WrongBanker, "%MINBANKERS%", tostring( Bank_SetBankerMinNum ) ) )
+	    
+		return end
+	
+	    if timer.Exists("RobberyCooldown") then 
+		    
+			DarkRP.notify( caller, 1, 5, Bank_WrongCooldown )
+		
+		return end
+	   
+	    if timer.Exists("RobberyCountdown") then 
+		    
+			DarkRP.notify( caller, 1, 5, Bank_WrongRobbery )
+        
+		return end
+		
+	    if caller:IsPlayer() && IsValid( caller ) then
 	        
 			haveRequiredCops = false
 			haveRequiredBankers = false
@@ -151,28 +173,42 @@ end
 function ENT:CheckForFail( caller )
     
 	if !IsValid( caller ) then 
-	    RobberyCooldown()
+	    
+		RobberyCooldown()
 		timer.Destroy( "RobberyCountdown" )
 	
-	elseif !caller:Alive() then
-	    DarkRP.notifyAll( 1, 5, string.Replace( Bank_FailDied, "%PLAYERNAME%", caller:Nick() ) )
+	end
+	
+	if !caller:Alive() then
+	    
+		DarkRP.notifyAll( 1, 5, string.Replace( Bank_FailDied, "%PLAYERNAME%", caller:Nick() ) )
         RobberyCooldown()
 		timer.Destroy( "RobberyCountdown" )
 	
-	elseif !table.HasValue( Bank_SetCanRobTeam, team.GetName( caller:Team() ) ) then
-	    DarkRP.notifyAll( 1, 5, string.Replace( Bank_FailChanged, "%PLAYERNAME%", caller:Nick() ) )
+	end
+	
+	if !table.HasValue( Bank_SetCanRobTeam, team.GetName( caller:Team() ) ) then
+	    
+		DarkRP.notifyAll( 1, 5, string.Replace( Bank_FailChanged, "%PLAYERNAME%", caller:Nick() ) )
         RobberyCooldown()
 		timer.Destroy( "RobberyCountdown" )
     
-	elseif caller:getDarkRPVar( "Arrested", true ) then
-	    DarkRP.notifyAll( 1, 5, string.Replace( Bank_FailArrested, "%PLAYERNAME%", caller:Nick() ) )
+	end
+	
+	if caller:getDarkRPVar( "Arrested", true ) then
+	    
+		DarkRP.notifyAll( 1, 5, string.Replace( Bank_FailArrested, "%PLAYERNAME%", caller:Nick() ) )
         RobberyCooldown()
 		timer.Destroy( "RobberyCountdown" )
 	
-	elseif caller:GetPos():Distance( self:GetPos() ) > Bank_SetMaxRadius then
-	    DarkRP.notifyAll( 1, 5, string.Replace( Bank_FailArea, "%PLAYERNAME%", caller:Nick() ) )
+	end
+	
+	if caller:GetPos():Distance( self:GetPos() ) > Bank_SetMaxRadius then
+	    
+		DarkRP.notifyAll( 1, 5, string.Replace( Bank_FailArea, "%PLAYERNAME%", caller:Nick() ) )
         RobberyCooldown()
 		timer.Destroy( "RobberyCountdown" )
+	
 	end
 
 end
@@ -186,9 +222,8 @@ function ENT:RobberyCountdown( caller )
 	
 	timer.Create( "RobberyCountdown", 1, Bank_SetRobTime, function()
 	    
-		BankUpdateDisplay( string.Replace( Bank_DisplayRobbing, "%ROBBINGTIMER%", string.ToMinutesSeconds( bankRobTimer ) ) )
 		self:CheckForFail( caller )
-		
+	
 		bankRobTimer = bankRobTimer -1
 		
 		if bankRobTimer <= 0 then
@@ -235,17 +270,13 @@ function RobberyCooldown()
 	timer.Destroy( "SoundLoop" )
 	
 	timer.Create( "RobberyCooldown", 1, Bank_SetCooldownTime, function()
-	    
-		BankUpdateDisplay( string.Replace( Bank_DisplayCooldown, "%COOLDOWNTIMER%", string.ToMinutesSeconds( bankCooldownTimer ) ) )
-		
+	
 		bankCooldownTimer = bankCooldownTimer -1
 		
 		if bankCooldownTimer <= 0 then
 		    
-			BankUpdateDisplay( Bank_DisplayReady )
-			
 			duringCooldown = false
-	    
+	
 		end
 	
 	end)
@@ -263,6 +294,8 @@ function BankUpdateDisplay( text )
 
 end
 
+
+
 -- Check For Updates --
 function BankCheckForUpdate()
 
@@ -270,7 +303,7 @@ function BankCheckForUpdate()
 	    
 		function( body )   
 	        
-	        if body > "1.6.3" then 
+	        if body > "1.6.4" then 
 			    
 				PrintMessage( HUD_PRINTTALK, "[Bank Robbery System]: This server is using an outdated version of the Bank Robbery System!" )
 
@@ -351,6 +384,30 @@ function BankRobberyLangSetup()
 end
 hook.Add( "InitPostEntity", "BankRobberyLangAutoSetup", BankRobberyLangSetup )
 
+-- Robbery Detector --
+function RobberyDetector()
+    
+	if timer.Exists("RobberyCountdown") then
+	    
+		BankUpdateDisplay( string.Replace( Bank_DisplayRobbing, "%ROBBINGTIMER%", string.ToMinutesSeconds( bankRobTimer ) ) )
+	
+	end
+	
+	if timer.Exists("RobberyCooldown") then
+	    
+		BankUpdateDisplay( string.Replace( Bank_DisplayCooldown, "%COOLDOWNTIMER%", string.ToMinutesSeconds( bankCooldownTimer ) ) )
+	
+	end  
+	  
+	if !timer.Exists("RobberyCountdown") && !timer.Exists("RobberyCooldown") then
+	    
+		BankUpdateDisplay( Bank_DisplayReady )
+   
+    end
+
+end
+hook.Add( "Think", "RobberyDetector", RobberyDetector )
+
 -- Create Language Command --
 function SelectBankLanguage( ply, cmd, args )
     
@@ -360,7 +417,6 @@ function SelectBankLanguage( ply, cmd, args )
 	file.Write( "bankrobberysystem/config_save/saved_lang.txt", args[1] )
 	
 	BankLang()
-	BankUpdateDisplay( Bank_DisplayReady )
 	  
 end
 concommand.Add( "selectBankLang", SelectBankLanguage )
