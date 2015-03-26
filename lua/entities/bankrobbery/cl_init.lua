@@ -50,7 +50,9 @@ function ENT:Draw()
 end
 
 function BankStatusUpdate()
-    BankVault = net.ReadString()
+    
+	BankVault = net.ReadString()
     BankStatus = net.ReadString()
+
 end
-net.Receive("DisplayUpdate", BankStatusUpdate)
+net.Receive("Bank_DisplayUpdate", BankStatusUpdate)

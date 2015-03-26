@@ -23,7 +23,7 @@ local duringRobbery = false
 local duringCooldown = false
 
 -- Do Some Shit --
-util.AddNetworkString( "DisplayUpdate" )
+util.AddNetworkString( "Bank_DisplayUpdate" )
 util.PrecacheSound( "soundloud.wav" )
 resource.AddFile( "sound/soundloud.wav" )
 
@@ -253,10 +253,14 @@ function RobberyCooldown()
 end
 
 function BankUpdateDisplay( text )
-    net.Start( "DisplayUpdate" )
-	    net.WriteString( Bank_DisplayVault )
+    
+	net.Start( "Bank_DisplayUpdate" )
+	   
+   	    net.WriteString( Bank_DisplayVault )
 		net.WriteString( text )
+	
 	net.Broadcast()
+
 end
 
 -- Check For Updates --
