@@ -406,7 +406,8 @@ function RobberyDetector()
     end
 
 end
-hook.Add( "Think", "RobberyDetector", RobberyDetector )
+timer.Create("BRS_RobberyDetector", 1, 0, RobberyDetector )
+--hook.Add( "Think", "RobberyDetector", RobberyDetector )
 
 -- Create Language Command --
 function SelectBankLanguage( ply, cmd, args )
