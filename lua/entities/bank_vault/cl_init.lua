@@ -10,17 +10,16 @@
 ]]--
 
 include("shared.lua")
-include("config.lua")
 
 function ENT:Initialize()
 	self.Color = Color( 255, 255, 255, 255 )
 end
 
-local status = "Ready"
-function getUpdate()
-    status = net.ReadString()
+local b_status = "Ready"
+function getBankUpdate()
+    b_status = net.ReadString()
 end
-net.Receive("clientUpdate", getUpdate)
+net.Receive("RSBank_clientUpdate", getBankUpdate)
 
 function ENT:Draw()
     local pos = self:GetPos()
@@ -43,17 +42,17 @@ function ENT:Draw()
 
     cam.Start3D2D(pos, ang, 1)
         draw.DrawText("Bank Vault", "Default", 0, -100, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER)
-        draw.DrawText(status, "Default", 0, -90, Color(255, 9, 9, 237), TEXT_ALIGN_CENTER)
+        draw.DrawText(b_status, "Default", 0, -90, Color(255, 9, 9, 237), TEXT_ALIGN_CENTER)
         draw.DrawText("$"..BankConfig.reward, "Default", 0, -80, Color(20, 150, 20, 255), TEXT_ALIGN_CENTER)
     cam.End3D2D()
    
     cam.Start3D2D(pos1, ang1, 1)
         draw.DrawText("Bank Vault", "Default", 0, -100, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER)
-        draw.DrawText(status, "Default", 0, -90, Color(255, 9, 9, 237), TEXT_ALIGN_CENTER)
+        draw.DrawText(b_status, "Default", 0, -90, Color(255, 9, 9, 237), TEXT_ALIGN_CENTER)
         draw.DrawText("$"..BankConfig.reward, "Default", 0, -80, Color(20, 150, 20, 255), TEXT_ALIGN_CENTER)   
     cam.End3D2D()
 
-    if( self.rotate > 359 ) then self.rotate = 0 end
+    if(self.rotate > 359) then self.rotate = 0 end
 
     self.rotate = self.rotate -(100*(self.lasttime -SysTime()))
     self.lasttime = SysTime()

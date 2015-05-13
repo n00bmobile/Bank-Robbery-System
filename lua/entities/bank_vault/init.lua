@@ -11,8 +11,8 @@
 
 AddCSLuaFile("shared.lua")
 AddCSLuaFile("cl_init.lua")
+
 include("shared.lua")
-include("config.lua")
 
 BankRS = {}
 
@@ -78,7 +78,7 @@ function ENT:Use(activator, caller)
 	    return
     end		
 	
-	DarkRP.notifyAll(1, 5, activator:Nick().." has started a robbery!")
+	DarkRP.notifyAll(0, 5, activator:Nick().." has started a robbery!")
 		
 	activator:setDarkRPVar("wanted", true)
 	activator:setDarkRPVar("wantedReason", "Robbing The Bank!")
@@ -93,7 +93,7 @@ function ENT:duringRobbery(ply)
 	
     timer.Create("robberyTimer", 1, 0, function()
 		BankRS.robberyTB = BankRS.robberyTB -1
-		updateClientInfo("Robbing: "..string.ToMinutesSeconds(BankRS.robberyTB))
+		updateBankInfo("Robbing: "..string.ToMinutesSeconds(BankRS.robberyTB))
 		
 		if ply:getDarkRPVar("arrested", true) then
 		    duringCooldown(ply)
@@ -119,7 +119,7 @@ function ENT:duringRobbery(ply)
 			ply:addMoney(BankConfig.reward)
 		    ply:setDarkRPVar("wanted", false)
 			
-		    DarkRP.notifyAll(1, 5, ply:Nick().." has finished a robbery!")
+		    DarkRP.notifyAll(0, 5, ply:Nick().." has finished a robbery!")
 		end
 	end)
 end
@@ -146,11 +146,11 @@ function duringCooldown()
     timer.Destroy("robberyTimer")	
 	timer.Create("cooldownTimer", 1, 0, function()
         BankRS.cooldownTB = BankRS.cooldownTB -1
-		updateClientInfo("Cooldown: "..string.ToMinutesSeconds(BankRS.cooldownTB))
+		updateBankInfo("Cooldown: "..string.ToMinutesSeconds(BankRS.cooldownTB))
 
 		if BankRS.cooldownTB <= 0 then
 		    BankRS.duringC = false
-			updateClientInfo("Ready")
+			updateBankInfo("Ready")
 			
 			
 			timer.Destroy("cooldownTimer")
@@ -158,8 +158,8 @@ function duringCooldown()
 	end)
 end
 
-function updateClientInfo(string)
-    net.Start("clientUpdate")
+function updateBankInfo(string)
+    net.Start("RSBank_clientUpdate")
 	    net.WriteString(string)
 	net.Broadcast()
 end
