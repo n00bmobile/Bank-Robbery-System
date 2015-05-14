@@ -205,11 +205,11 @@ function updateCheck()
     http.Fetch("https://dl.dropboxusercontent.com/s/90pfxdcg0mtbumu/bankVersion.txt", 
 		function(body)   
 	        if body > "1.7.0" then 
-			    ply:ChatPrint("[Bank Robbery System]: This server uses an outdated version of this addon, inform the server owner. (Messages will appear everytime a player joins)")
+			    PrintMessage(HUD_PRINTTALK, "[Bank Robbery System]: This server uses an outdated version of this addon, inform the server owner. (Messages will appear everytime a player joins)")
 			end
 		end,
 	    function(error)
-		    ply:ChatPrint("[Bank Robbery System]: An error occured while trying to check for updates. ("..error..")")
+		    PrintMessage(HUD_PRINTTALK, "[Bank Robbery System]: An error occured while trying to check for updates. ("..error..")")
 	    end
 	)
 end
