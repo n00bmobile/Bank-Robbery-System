@@ -40,6 +40,7 @@ This addon is inspired by the Bank Robbery System from Script Fodder. However th
 #### Changes(Feel Free to Report Any Bugs to Me): ####
 
 * REMADE THE BANK FROM SCRATH (Net Spam Fixed)
+* Fixed Bank Team Number Restriction Bug.
 
 ##### Quick Questions: #####
 
