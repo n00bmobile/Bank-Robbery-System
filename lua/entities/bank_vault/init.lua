@@ -67,7 +67,7 @@ function ENT:Use(activator, caller)
 	elseif #player.GetAll() < BankConfig.minP then
 		DarkRP.notify(activator, 1, 5, "A robbery can't be started without enough players!")
 	    return
-	elseif table.Count(team.GetPlayers(team.GetName(BankConfig.teamR["Cops"]))) < BankConfig.minC then
+	elseif !countTeamNumber() then
 		DarkRP.notify(activator, 1, 5, "A robbery can't be started without enough cops!")
 	    return
 	elseif BankRS.duringR then
@@ -85,6 +85,22 @@ function ENT:Use(activator, caller)
 		
 	self:duringRobbery(activator)
 	duringRobberySiren()
+end
+
+function countTeamNumber()
+    local countedTeam = 0
+	
+	for k, v in pairs(player.GetAll()) do
+	    if table.HasValue(BankConfig.teamR["Cops"], team.GetName(v:Team())) then
+			countedTeam = countedTeam +1
+		end
+	end
+	
+    if countedTeam >= BankConfig.minC then
+		return true
+    else
+		return false
+    end
 end
 
 function ENT:duringRobbery(ply)
@@ -152,7 +168,6 @@ function duringCooldown()
 		    BankRS.duringC = false
 			updateBankInfo("Ready")
 			
-			
 			timer.Destroy("cooldownTimer")
 		end
 	end)
@@ -204,7 +219,7 @@ hook.Add("InitPostEntity", "loadSaveFile", permaSpawnLoad)
 function updateCheck()
     http.Fetch("https://dl.dropboxusercontent.com/s/90pfxdcg0mtbumu/bankVersion.txt", 
 		function(body)   
-	        if body > "1.7.1" then 
+	        if body > "1.7.2" then 
 			    PrintMessage(HUD_PRINTTALK, "[Bank Robbery System]: This server uses an outdated version of this addon, inform the server owner. (Messages will appear everytime a player joins)")
 			end
 		end,

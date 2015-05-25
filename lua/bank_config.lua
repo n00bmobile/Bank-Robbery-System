@@ -22,6 +22,6 @@ BankConfig.minP = 10 //Minimum of players needed to start a robbery. (0 to disab
 BankConfig.loop = true //Define if the siren when robbing the bank should loop.
 
 BankConfig.teamR = { //The teams considered cops/robbers by the bank.
-["Cops"] = {"Civil Protection", "Chief"},
+["Cops"] = {"Civil Protection", "Civil Protection Chief"},
 ["Robbers"] = {"Gangster", "Mob boss"}
 }
