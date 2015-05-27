@@ -88,15 +88,15 @@ function ENT:Use(activator, caller)
 end
 
 function countTeamNumber()
-    local countedTeam = 0
+    BankRS.BankRS.countedTeam = 0
 	
 	for k, v in pairs(player.GetAll()) do
 	    if table.HasValue(BankConfig.teamR["Cops"], team.GetName(v:Team())) then
-			countedTeam = countedTeam +1
+			BankRS.countedTeam = BankRS.countedTeam +1
 		end
 	end
 	
-    if countedTeam >= BankConfig.minC then
+    if BankRS.countedTeam >= BankConfig.minC then
 		return true
     else
 		return false
