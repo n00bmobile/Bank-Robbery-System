@@ -88,7 +88,7 @@ function ENT:Use(activator, caller)
 end
 
 function countTeamNumber()
-    BankRS.BankRS.countedTeam = 0
+    BankRS.countedTeam = 0
 	
 	for k, v in pairs(player.GetAll()) do
 	    if table.HasValue(BankConfig.teamR["Cops"], team.GetName(v:Team())) then
@@ -219,7 +219,7 @@ hook.Add("InitPostEntity", "loadSaveFile", permaSpawnLoad)
 function updateCheck()
     http.Fetch("https://dl.dropboxusercontent.com/s/90pfxdcg0mtbumu/bankVersion.txt", 
 		function(body)   
-	        if body > "1.7.2" then 
+	        if body > "1.7.3" then 
 			    PrintMessage(HUD_PRINTTALK, "[Bank Robbery System]: This server uses an outdated version of this addon, inform the server owner. (Messages will appear everytime a player joins)")
 			end
 		end,
