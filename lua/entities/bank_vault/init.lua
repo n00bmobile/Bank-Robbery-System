@@ -16,9 +16,6 @@ include("shared.lua")
 
 BankRS = {}
 
-BankRS.duringR = false
-BankRS.duringC = false
-
 function ENT:Initialize()
 	self.Entity:SetModel("models/props/cs_assault/moneypallet.mdl")
 	self.Entity:SetSolid(SOLID_VPHYSICS)
@@ -55,8 +52,7 @@ function ENT:SpawnFunction(v, tr)
 	
 	return bank
 end
-  
-local bankU_time = CurTime()
+
 function ENT:Use(activator, caller)
     if !table.HasValue(BankConfig.teamR["Robbers"], team.GetName(activator:Team())) then
 		DarkRP.notify(activator, 1, 5, "A robbery can't be started as a "..team.GetName(activator:Team()).."!")
@@ -67,13 +63,13 @@ function ENT:Use(activator, caller)
 	elseif #player.GetAll() < BankConfig.minP then
 		DarkRP.notify(activator, 1, 5, "A robbery can't be started without enough players!")
 	    return
-	elseif !countTeamNumber() then
-		DarkRP.notify(activator, 1, 5, "A robbery can't be started without enough cops!")
+	elseif !BankRS.countTeamNumber() then
+		DarkRP.notify(activator, 1, 5, "A robbery can't be started without enough cops or bankers!")
 	    return
-	elseif BankRS.duringR then
+	elseif timer.Exists("robberyTimer") then
 		DarkRP.notify(activator, 1, 5, "A robbery is already in progress!")
 	    return
-	elseif BankRS.duringC then
+	elseif timer.Exists("cooldownTimer") then
         DarkRP.notify(activator, 1, 5, "A robbery can't be started during a cooldown!")
 	    return
     end		
@@ -84,19 +80,24 @@ function ENT:Use(activator, caller)
 	activator:setDarkRPVar("wantedReason", "Robbing The Bank!")
 		
 	self:duringRobbery(activator)
-	duringRobberySiren()
+	BankRS.duringRobberySiren()
 end
 
-function countTeamNumber()
-    BankRS.countedTeam = 0
+function BankRS.countTeamNumber()
+    local countedTeam = 0
+	local countedBanker = 0
 	
 	for k, v in pairs(player.GetAll()) do
 	    if table.HasValue(BankConfig.teamR["Cops"], team.GetName(v:Team())) then
-			BankRS.countedTeam = BankRS.countedTeam +1
+			countedTeam = countedTeam +1
+		end
+		
+		if table.HasValue(BankConfig.teamR["Bankers"], team.GetName(v:Team())) then
+		    countedBanker = countedBanker +1
 		end
 	end
 	
-    if BankRS.countedTeam >= BankConfig.minC then
+    if countedTeam >= BankConfig.minC && countedBanker >= BankConfig.minB then
 		return true
     else
 		return false
@@ -104,48 +105,46 @@ function countTeamNumber()
 end
 
 function ENT:duringRobbery(ply)
-	BankRS.robberyTB = BankConfig.robberyT
-	BankRS.duringR = true
+	local robberyTB = BankConfig.robberyT
 	
     timer.Create("robberyTimer", 1, 0, function()
-		BankRS.robberyTB = BankRS.robberyTB -1
-		updateBankInfo("Robbing: "..string.ToMinutesSeconds(BankRS.robberyTB))
+		robberyTB = robberyTB -1
+		BankRS.updateBankInfo("Robbing: "..string.ToMinutesSeconds(robberyTB))
 		
 		if ply:getDarkRPVar("arrested", true) then
-		    duringCooldown(ply)
-		    ply:setDarkRPVar("wanted", false)
-			
 			DarkRP.notifyAll(1, 5, ply:Nick().." has been arrested during a robbery!")
+			BankRS.duringCooldown()
+		    
+			ply:setDarkRPVar("wanted", false)
             return			
 		elseif !ply:Alive() then
-			duringCooldown(ply)
-			ply:setDarkRPVar("wanted", false)
-			
 			DarkRP.notifyAll(1, 5, ply:Nick().." has been killed during a robbery!")
+			BankRS.duringCooldown()
+			
+			ply:setDarkRPVar("wanted", false)
 			return
 		elseif ply:GetPos():Distance(self:GetPos()) > BankConfig.maxD then
-		    duringCooldown(ply)
-			ply:setDarkRPVar("wanted", false)
+		    DarkRP.notifyAll(1, 5, ply:Nick().." has exited the robbery area!")
+			BankRS.duringCooldown()
 			
-			DarkRP.notifyAll(1, 5, ply:Nick().." has exited the robbery area!")
+			ply:setDarkRPVar("wanted", false)
 			return
-		elseif BankRS.robberyTB <= 0 then
-		    duringCooldown(ply)
+		elseif robberyTB <= 0 then
+		    DarkRP.notifyAll(0, 5, ply:Nick().." has finished a robbery!")
+			BankRS.duringCooldown()
 			
 			ply:addMoney(BankConfig.reward)
 		    ply:setDarkRPVar("wanted", false)
-			
-		    DarkRP.notifyAll(0, 5, ply:Nick().." has finished a robbery!")
 		end
 	end)
 end
 
-function duringRobberySiren()
+function BankRS.duringRobberySiren()
     BroadcastLua('surface.PlaySound("siren.wav")')
 	
 	if BankConfig.loop then
-	    timer.Create("sirenLoop", 12, 0, function()
-		    if !BankRS.duringR then
+	    timer.Create("sirenLoop", SoundDuration("siren.wav"), 0, function()
+		    if !timer.Exists("robberyTimer") then
 			    timer.Destroy("sirenLoop")
 			else
 			    BroadcastLua('surface.PlaySound("siren.wav")')
@@ -154,32 +153,28 @@ function duringRobberySiren()
     end
 end
 
-function duringCooldown()
-    BankRS.cooldownTB = BankConfig.cooldownT
-	BankRS.duringR = false
-	BankRS.duringC = true
-
+function BankRS.duringCooldown()
+    local cooldownTB = BankConfig.cooldownT
+	
     timer.Destroy("robberyTimer")	
 	timer.Create("cooldownTimer", 1, 0, function()
-        BankRS.cooldownTB = BankRS.cooldownTB -1
-		updateBankInfo("Cooldown: "..string.ToMinutesSeconds(BankRS.cooldownTB))
+        cooldownTB = cooldownTB -1
+		BankRS.updateBankInfo("Cooldown: "..string.ToMinutesSeconds(cooldownTB))
 
-		if BankRS.cooldownTB <= 0 then
-		    BankRS.duringC = false
-			updateBankInfo("Ready")
-			
+		if cooldownTB <= 0 then
+			BankRS.updateBankInfo("Ready")
 			timer.Destroy("cooldownTimer")
 		end
 	end)
 end
 
-function updateBankInfo(string)
+function BankRS.updateBankInfo(string)
     net.Start("RSBank_clientUpdate")
 	    net.WriteString(string)
 	net.Broadcast()
 end
 
-function permaSpawn(ply)
+function BankRS.permaSpawn(ply)
     local bank = ents.FindByClass("bank_vault")
 	
 	if ply:IsSuperAdmin() then
@@ -189,22 +184,34 @@ function permaSpawn(ply)
 	    
 		for k, bankP in pairs(ents.FindByClass("bank_vault")) do
 		    BankRS.save = {pos = bankP:GetPos(),ang = bankP:GetAngles()}
-		
-	        file.CreateDir("BankRS")
-		    file.Write("BankRS/"..game.GetMap()..".txt", util.TableToJSON(BankRS.save))
-		
-		    permaSpawnLoad()
-			bankP:Remove()
-		    
-			ply:ChatPrint("[Bank Robbery System]: The Bank Position has been saved an loaded on "..game.GetMap())
+		    bankP:Remove()
 		end
+	   
+     	file.CreateDir("BankRS")
+		file.Write("BankRS/"..game.GetMap()..".txt", util.TableToJSON(BankRS.save))
+		
+		permaSpawnLoad()
+	    ply:ChatPrint("[Bank Robbery System]: The Bank Position has been saved an loaded on "..game.GetMap())
 	else
 	    ply:ChatPrint("[Bank Robbery System]: The Bank Position can only be saved by a superadmin.")
 	end
 end
-concommand.Add("BankRS_Save", permaSpawn)
+concommand.Add("BankRS_Save", BankRS.permaSpawn)
 
-function permaSpawnLoad()
+function BankRS.permaSpawnRemove()
+    if !file.Exists("bankrs/"..game.GetMap()..".txt", "DATA") then
+	    ply:ChatPrint("[Bank Robbery System]: There isn't a save for the Bank Position.")
+	else
+	    for k, bankP in pairs(ents.FindByClass("bank_vault")) do
+			bankP:Remove()
+		end
+		
+		ply:ChatPrint("[Bank Robbery System]: The Bank Position has been deleted on "..game.GetMap())
+	end
+end
+concommand.Add("BankRS_Remove", BankRS.permaSpawnRemove)
+
+function BankRS.permaSpawnLoad()
     if !file.Exists("BankRS/"..game.GetMap()..".txt", "DATA") then return end
 	
 	local bank = ents.Create("bank_vault")
@@ -214,18 +221,18 @@ function permaSpawnLoad()
 	bank:SetAngles(json.ang)
 	bank:Spawn()
 end
-hook.Add("InitPostEntity", "loadSaveFile", permaSpawnLoad)
+hook.Add("InitPostEntity", "loadSaveFile", BankRS.permaSpawnLoad)
 
-function updateCheck()
+function BankRS.updateCheck()
     http.Fetch("https://dl.dropboxusercontent.com/s/90pfxdcg0mtbumu/bankVersion.txt", 
 		function(body)   
-	        if body > "1.7.3" then 
-			    PrintMessage(HUD_PRINTTALK, "[Bank Robbery System]: This server uses an outdated version of this addon, inform the server owner. (Messages will appear everytime a player joins)")
+	        if body > "1.7.4" then 
+			    PrintMessage(HUD_PRINTTALK, "[Bank Robbery System]: This server uses an outdated version of this addon, inform the server owner. (Messages will appear every time a player joins)")
 			end
 		end,
 	    function(error)
-		    PrintMessage(HUD_PRINTTALK, "[Bank Robbery System]: An error occured while trying to check for updates. ("..error..")")
+		    PrintMessage(HUD_PRINTTALK, "[Bank Robbery System]: An error occurred while trying to check for updates. ("..error..")")
 	    end
 	)
 end
-hook.Add("PlayerInitialSpawn", "rememberUpdate", updateCheck)
+hook.Add("PlayerInitialSpawn", "rememberUpdate", BankRS.updateCheck)

@@ -21,6 +21,7 @@ function getBankUpdate()
 end
 net.Receive("RSBank_clientUpdate", getBankUpdate)
 
+surface.CreateFont("BankFont", {font = "Coolvetica", size = 16})
 function ENT:Draw()
     local pos = self:GetPos()
     local ang = self:GetAngles()
@@ -41,15 +42,25 @@ function ENT:Draw()
     ang1:RotateAroundAxis(ang1:Up(), 0)
 
     cam.Start3D2D(pos, ang, 1)
-        draw.DrawText("Bank Vault", "Default", 0, -100, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER)
-        draw.DrawText(b_status, "Default", 0, -90, Color(255, 9, 9, 237), TEXT_ALIGN_CENTER)
-        draw.DrawText("$"..BankConfig.reward, "Default", 0, -80, Color(20, 150, 20, 255), TEXT_ALIGN_CENTER)
+        draw.SimpleTextOutlined("$"..BankConfig.reward, "BankFont", 0, -75, Color(20, 150, 20, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
+		
+		if b_status != "Ready" then    
+			draw.SimpleTextOutlined("Bank Vault", "BankFont", 0, -100, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
+			draw.SimpleTextOutlined(b_status, "BankFont", 0, -88, Color(255, 9, 9, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
+		else
+			draw.SimpleTextOutlined("Bank Vault", "BankFont", 0, -90, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
+        end		
     cam.End3D2D()
    
     cam.Start3D2D(pos1, ang1, 1)
-        draw.DrawText("Bank Vault", "Default", 0, -100, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER)
-        draw.DrawText(b_status, "Default", 0, -90, Color(255, 9, 9, 237), TEXT_ALIGN_CENTER)
-        draw.DrawText("$"..BankConfig.reward, "Default", 0, -80, Color(20, 150, 20, 255), TEXT_ALIGN_CENTER)   
+        draw.SimpleTextOutlined("$"..BankConfig.reward, "BankFont", 0, -75, Color(20, 150, 20, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
+		
+		if b_status != "Ready" then    
+			draw.SimpleTextOutlined("Bank Vault", "BankFont", 0, -100, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
+			draw.SimpleTextOutlined(b_status, "BankFont", 0, -88, Color(255, 9, 9, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
+		else
+			draw.SimpleTextOutlined("Bank Vault", "BankFont", 0, -90, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
+        end	   
     cam.End3D2D()
 
     if(self.rotate > 359) then self.rotate = 0 end
