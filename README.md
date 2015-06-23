@@ -44,6 +44,7 @@ This addon is inspired by the Bank Robbery System from Script Fodder. However th
 * Rotating Text Now Looks Fabulous.
 * Removed Not Needed Shit.
 * Added Banker Restriction (0 To Disable).
+* Fixed Issue With "BankRS_Save" and "BankRS_Remove".
 * More Shit That I Don't Remember.
 
 ##### Quick Questions: #####

@@ -74,12 +74,12 @@ function ENT:Use(activator, caller)
 	    return
     end		
 	
-	DarkRP.notifyAll(0, 5, activator:Nick().." has started a robbery!")
-		
 	activator:setDarkRPVar("wanted", true)
 	activator:setDarkRPVar("wantedReason", "Robbing The Bank!")
-		
+	
 	self:duringRobbery(activator)
+	
+	DarkRP.notifyAll(0, 5, activator:Nick().." has started a robbery!")
 	BankRS.duringRobberySiren()
 end
 
@@ -109,7 +109,7 @@ function ENT:duringRobbery(ply)
 	
     timer.Create("robberyTimer", 1, 0, function()
 		robberyTB = robberyTB -1
-		BankRS.updateBankInfo("Robbing: "..string.ToMinutesSeconds(robberyTB))
+		BankRS.updateBankInfo("Robbing: "..string.ToMinutesSeconds(robberyTB)) //I don't trust NWVars anymore... Thanks Garry!
 		
 		if ply:getDarkRPVar("arrested", true) then
 			DarkRP.notifyAll(1, 5, ply:Nick().." has been arrested during a robbery!")
@@ -143,9 +143,9 @@ function BankRS.duringRobberySiren()
     BroadcastLua('surface.PlaySound("siren.wav")')
 	
 	if BankConfig.loop then
-	    timer.Create("sirenLoop", SoundDuration("siren.wav"), 0, function()
+	    timer.Create("sirenLoop", SoundDuration("sound/siren.wav"), 0, function()
 		    if !timer.Exists("robberyTimer") then
-			    timer.Destroy("sirenLoop")
+				timer.Destroy("sirenLoop")
 			else
 			    BroadcastLua('surface.PlaySound("siren.wav")')
 			end
@@ -190,23 +190,26 @@ function BankRS.permaSpawn(ply)
      	file.CreateDir("BankRS")
 		file.Write("BankRS/"..game.GetMap()..".txt", util.TableToJSON(BankRS.save))
 		
-		permaSpawnLoad()
-	    ply:ChatPrint("[Bank Robbery System]: The Bank Position has been saved an loaded on "..game.GetMap())
+		BankRS.permaSpawnLoad()
+	    
+		ply:ChatPrint("[Bank Robbery System]: The Bank Position has been saved an loaded on "..game.GetMap())
 	else
 	    ply:ChatPrint("[Bank Robbery System]: The Bank Position can only be saved by a superadmin.")
 	end
 end
 concommand.Add("BankRS_Save", BankRS.permaSpawn)
 
-function BankRS.permaSpawnRemove()
+function BankRS.permaSpawnRemove(ply)
     if !file.Exists("bankrs/"..game.GetMap()..".txt", "DATA") then
 	    ply:ChatPrint("[Bank Robbery System]: There isn't a save for the Bank Position.")
 	else
-	    for k, bankP in pairs(ents.FindByClass("bank_vault")) do
+	    ply:ChatPrint("[Bank Robbery System]: The Bank Position has been deleted on "..game.GetMap())
+		
+		for k, bankP in pairs(ents.FindByClass("bank_vault")) do
 			bankP:Remove()
 		end
 		
-		ply:ChatPrint("[Bank Robbery System]: The Bank Position has been deleted on "..game.GetMap())
+		file.Delete("bankrs/"..game.GetMap()..".txt")
 	end
 end
 concommand.Add("BankRS_Remove", BankRS.permaSpawnRemove)
@@ -226,7 +229,7 @@ hook.Add("InitPostEntity", "loadSaveFile", BankRS.permaSpawnLoad)
 function BankRS.updateCheck()
     http.Fetch("https://dl.dropboxusercontent.com/s/90pfxdcg0mtbumu/bankVersion.txt", 
 		function(body)   
-	        if body > "1.7.4" then 
+	        if body > "1.7.5" then 
 			    PrintMessage(HUD_PRINTTALK, "[Bank Robbery System]: This server uses an outdated version of this addon, inform the server owner. (Messages will appear every time a player joins)")
 			end
 		end,
