@@ -25,5 +25,5 @@ BankConfig.loop = true //Define if the siren when robbing the bank should loop.
 BankConfig.teamR = { //The teams considered cops/robbers by the bank.
 ["Cops"] = {"Civil Protection", "Civil Protection Chief"},
 ["Robbers"] = {"Mob boss", "Gangster"},
-["Bankers"] = {}
+["Bankers"] = {""}
 }

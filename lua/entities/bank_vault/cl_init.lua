@@ -48,7 +48,7 @@ function ENT:Draw()
 			draw.SimpleTextOutlined("Bank Vault", "BankFont", 0, -100, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
 			draw.SimpleTextOutlined(b_status, "BankFont", 0, -88, Color(255, 9, 9, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
 		else
-			draw.SimpleTextOutlined("Bank Vault", "BankFont", 0, -90, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
+			draw.SimpleTextOutlined("Bank Vault", "BankFont", 0, -88, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
         end		
     cam.End3D2D()
    
@@ -59,7 +59,7 @@ function ENT:Draw()
 			draw.SimpleTextOutlined("Bank Vault", "BankFont", 0, -100, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
 			draw.SimpleTextOutlined(b_status, "BankFont", 0, -88, Color(255, 9, 9, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
 		else
-			draw.SimpleTextOutlined("Bank Vault", "BankFont", 0, -90, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
+			draw.SimpleTextOutlined("Bank Vault", "BankFont", 0, -88, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
         end	   
     cam.End3D2D()
 
