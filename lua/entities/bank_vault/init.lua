@@ -139,7 +139,30 @@ function ENT:duringRobbery(ply)
 	end)
 end
 
+local function GetSoundDuration()
+	if SoundDuration("siren.wav") < 2 then
+		return 15
+	else
+		return math.ceil(SoundDuration("siren.wav"))
+	end
+end
+
 function BankRS.duringRobberySiren()
+	if BankConfig.loop then
+		DarkRP.notify(activator, 0, 5, "You have "..GetSoundDuration().." secs for prepair to enabling the siren")
+		timer.Create("sirenLoop", GetSoundDuration(), 0, function()
+			if !timer.Exists("robberyTimer") then
+				timer.Destroy("sirenLoop")
+			else
+				for k, bankP in pairs(ents.FindByClass("bank_vault")) do
+					bankP:EmitSound( Sound("siren.wav"), 75, 100)
+				end
+			end
+		end)
+    end
+end
+
+--[[ function BankRS.duringRobberySiren()
     BroadcastLua('surface.PlaySound("siren.wav")')
 	
 	if BankConfig.loop then
@@ -151,7 +174,7 @@ function BankRS.duringRobberySiren()
 			end
 		end)
     end
-end
+end ]]
 
 function BankRS.duringCooldown()
     local cooldownTB = BankConfig.cooldownT
