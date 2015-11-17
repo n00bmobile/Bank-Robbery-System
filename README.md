@@ -1,9 +1,9 @@
-Bank Robbery System for DarkRP 2.5+
+Bank Robbery System Version 1.7.6 for DarkRP 2.5+
 ======
 
 ##### Read Carefully: #####
 
-This is a Bank Robbery System for DarkRP 2.5+ and it may cause problems when used in others gamemodes.
+This is a Bank Robbery System for DarkRP 2.6+ and it may cause problems when used in others gamemodes.
 
 ##### Config File: #####
 
@@ -16,13 +16,7 @@ Place a Bank Vault Entity and use "BankRS_Save" on the console to save it. If yo
 ##### Instructions: #####
 
 All Instructions needed are located on the Config File.
-Fell free ask me your questions about the Addon.
-
-##### Distribution: #####
-
-PRODUCT LICENSED: http://creativecommons.org/licenses/by-nd/3.0/
-By using this product, you agree to follow the license limitations.
-Got any questions, contact author.
+Feel free ask me your questions about the Addon.
 
 ##### Final Thoughts: #####
 
@@ -33,34 +27,13 @@ This addon is inspired by the Bank Robbery System from Script Fodder. However th
 
 * n00bmobile
 
-#### Planned Updates: ####
-* Add money upgrade system based on time.
-* Give money as a reward to the player who killed the robber.
-
 #### Changes(Feel Free to Report Any Bugs to Me): ####
 
-* REMADE THE BANK FROM SCRATH (Net Spam Fixed).
-* Fixed Bank Team Number Restriction Bug.
-* Rotating Text Now Looks Fabulous.
-* Removed Not Needed Shit.
-* Added Banker Restriction (0 To Disable).
-* Fixed Issue With "BankRS_Save" and "BankRS_Remove".
-* More Shit That I Don't Remember.
+* Fixed Linux Perma Save Problem.
+* Changed Some Things...
 
-##### Quick Questions: #####
+##### Quick Question: #####
 
-1.The Robbery fails imediataly after starting it!
-
-You can't have two Banks on the same map. 
-
-2.I tried the new system for setting up teams... It gave me errors!
-
-Don't forget the quotes and the commas! Also put the exact same name that appears in*game. Ex: Mob boss = Mob Boss (WRONG!) Lua is case sensitive.
-
-3.The Config File is not working!
-
-Restart your server and make sure that you saved the Config File.
-
-4.I remember seeing this on CoderHire/Script Fodder...
+1.I remember seeing this on CoderHire/Script Fodder...
 
 I started this project wanting to clone the Bank Robbery System from Script Fodder, they both do the same but the code is all mine.
