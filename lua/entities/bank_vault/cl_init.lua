@@ -29,7 +29,7 @@ function ENT:Draw()
     ang1:RotateAroundAxis(ang1:Up(), 0)
 
     cam.Start3D2D(pos, ang, 1)
-        draw.SimpleTextOutlined("$"..BankConfig.Reward, "BankFont", 0, -75, Color(20, 150, 20, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
+        draw.SimpleTextOutlined(DarkRP.formatMoney(BankConfig.Reward), "BankFont", 0, -75, Color(20, 150, 20, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
 		
 		if (self:GetNWString("BankRSStatus") == "Cooldown: 00:00" || self:GetNWString("BankRSStatus") == "") then   
 			draw.SimpleTextOutlined("Bank Vault", "BankFont", 0, -88, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
@@ -40,7 +40,7 @@ function ENT:Draw()
     cam.End3D2D()
    
     cam.Start3D2D(pos1, ang1, 1)
-        draw.SimpleTextOutlined("$"..BankConfig.Reward, "BankFont", 0, -75, Color(20, 150, 20, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
+        draw.SimpleTextOutlined(DarkRP.formatMoney(BankConfig.Reward), "BankFont", 0, -75, Color(20, 150, 20, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
 		
 		if (self:GetNWString("BankRSStatus") == "Cooldown: 00:00" || self:GetNWString("BankRSStatus") == "") then
 			draw.SimpleTextOutlined("Bank Vault", "BankFont", 0, -88, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(0, 0, 0, 255))
@@ -54,6 +54,6 @@ function ENT:Draw()
 	    self.rotate = 0 
 	end
 
-    self.rotate = self.rotate -(100*(self.lasttime -SysTime()))
+    self.rotate = self.rotate -(10*(self.lasttime -SysTime())) -- so fast...
     self.lasttime = SysTime()
 end
