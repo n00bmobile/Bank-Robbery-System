@@ -50,24 +50,27 @@ end
 
 function ENT:Use(ply)
 	if (!table.HasValue(BankConfig.TeamRequired["Robbers"], team.GetName(ply:Team()))) then
-		DarkRP.notify(ply, 1, 5, "A robbery can't be started as a "..team.GetName(ply:Team()).."!")
+		DarkRP.notify(ply, 1, 3, "A robbery can't be started as a "..team.GetName(ply:Team()).."!")
 		return
 	elseif (ply:getDarkRPVar("arrested", true)) then
-        DarkRP.notify(ply, 1, 5, "A robbery can't be started while arrested!")
+        DarkRP.notify(ply, 1, 3, "A robbery can't be started while arrested!")
 		return 
 	elseif (#player.GetAll() < BankConfig.MinPlayers) then
-		DarkRP.notify(ply, 1, 5, "A robbery can't be started without enough players!")
+		DarkRP.notify(ply, 1, 3, "A robbery can't be started without enough players!")
 	    return
 	elseif (!BankRS.CountTeamNumber()) then
-		DarkRP.notify(ply, 1, 5, "A robbery can't be started without enough cops or bankers!")
+		DarkRP.notify(ply, 1, 3, "A robbery can't be started without enough cops or bankers!")
 	    return
 	elseif (timer.Exists("RobberyTimer")) then
-		DarkRP.notify(ply, 1, 5, "A robbery is already in progress!")
+		DarkRP.notify(ply, 1, 3, "A robbery is already in progress!")
 	    return
 	elseif (timer.Exists("CooldownTimer")) then
-        DarkRP.notify(ply, 1, 5, "A robbery can't be started during a cooldown!")
+        DarkRP.notify(ply, 1, 3, "A robbery can't be started during a cooldown!")
 	    return
-    end		
+    end	
+    
+    	DarkRP.notify(ply, 0, 7, "You started a bank robbery")
+    	DarkRP.notify(ply, 0, 7, "Do not go far away, otherwise it will stop")
 	
 	self:DuringRobbery(ply)
 	self:EmitSound("siren.wav", 130)
@@ -84,7 +87,7 @@ function ENT:Use(ply)
 	    end)
 	end
 	
-	DarkRP.notifyAll(0, 5, ply:Nick().." has started a robbery!")
+	DarkRP.notifyAll(0, 10, ply:Nick().." has started a robbery!")
 end
 
 function BankRS.CountTeamNumber()
