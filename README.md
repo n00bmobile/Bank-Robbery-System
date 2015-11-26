@@ -1,4 +1,4 @@
-Bank Robbery System Version 1.7.6 for DarkRP 2.5+
+Bank Robbery System Version 1.7.7 for DarkRP 2.5+
 ======
 
 ##### Read Carefully: #####
