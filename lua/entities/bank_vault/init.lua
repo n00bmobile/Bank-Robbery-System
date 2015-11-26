@@ -69,8 +69,8 @@ function ENT:Use(ply)
 	    return
     end	
     
-    	DarkRP.notify(ply, 0, 7, "You started a bank robbery")
-    	DarkRP.notify(ply, 0, 7, "Do not go far away, otherwise it will stop")
+    DarkRP.notify(ply, 0, 3, "You started a Bank Robbery!")
+    DarkRP.notify(ply, 0, 5, "Don't go too far away or the robbery will fail!")
 	
 	self:DuringRobbery(ply)
 	self:EmitSound("siren.wav", 130)
@@ -125,7 +125,10 @@ function ENT:DuringRobbery(ply)
 		    DarkRP.notifyAll(1, 5, ply:Nick().." has exited the robbery area!")
 			self:DuringCooldown(ply)
 		elseif (!ply:Alive()) then
-			DarkRP.notifyAll(1, 5, ply:Nick().." has been killed during a robbery!")
+			DarkRP.notifyAll(1, 5, ply:Nick().." died during a robbery!")
+			self:DuringCooldown(ply)
+		elseif (!table.HasValue(BankConfig.TeamRequired["Robbers"], team.GetName(ply:Team()))) then
+		    DarkRP.notifyAll(1, 5, ply:Nick().." changed jobs during a robbery!")
 			self:DuringCooldown(ply)
 		elseif (Robbery <= 0) then
 		    DarkRP.notifyAll(0, 5, ply:Nick().." has finished a robbery!")

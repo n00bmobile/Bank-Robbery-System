@@ -54,6 +54,6 @@ function ENT:Draw()
 	    self.rotate = 0 
 	end
 
-    self.rotate = self.rotate -(10*(self.lasttime -SysTime())) -- so fast...
+    self.rotate = self.rotate -(50*(self.lasttime -SysTime())) -- so fast...
     self.lasttime = SysTime()
 end
