@@ -202,7 +202,7 @@ end
 hook.Add("InitPostEntity", "BankRSCheckUpdate", function()
 	http.Fetch("https://dl.dropboxusercontent.com/s/90pfxdcg0mtbumu/bankVersion.txt", 
 		function(version)   
-	        if (version > "1.7.6") then 
+	        if (version > "1.7.7") then 
 			    MsgN(HUD_PRINTTALK, "[BankRS]: Outdated Version DETECTED!")
 			end
 		end,
