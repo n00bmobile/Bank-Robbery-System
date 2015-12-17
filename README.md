@@ -11,7 +11,7 @@ The Config File is located on the folder called lua, lua can be found on the mai
 
 ##### Automatic Bank Vault Spawn: #####
 
-Place a Bank Vault Entity and use "BankRS_Save" on the console to save it. If you change to another map, the Bank Vault won't spawn unless you set a position for it too.
+Place a Bank Vault Entity and use "BankRSSave" on the console to save it. If you change to another map, the Bank Vault won't spawn unless you set a position for it too.
 
 ##### Instructions: #####
 
