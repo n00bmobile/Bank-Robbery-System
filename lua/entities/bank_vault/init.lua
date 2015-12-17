@@ -52,7 +52,7 @@ function ENT:Use(ply)
 	if (!table.HasValue(BankConfig.TeamRequired["Robbers"], team.GetName(ply:Team()))) then
 		DarkRP.notify(ply, 1, 3, "A robbery can't be started as a "..team.GetName(ply:Team()).."!")
 		return
-	elseif (ply:getDarkRPVar("arrested", true)) then
+	elseif (ply:isArrested()) then
         DarkRP.notify(ply, 1, 3, "A robbery can't be started while arrested!")
 		return 
 	elseif (#player.GetAll() < BankConfig.MinPlayers) then
@@ -118,7 +118,7 @@ function ENT:DuringRobbery(ply)
 		Robbery = Robbery -1
 		self:SetNWString("BankRSStatus", "Robbing: "..string.ToMinutesSeconds(Robbery))
 		
-		if (ply:getDarkRPVar("arrested", true)) then
+		if (ply:isArrested()) then
 			DarkRP.notifyAll(1, 5, ply:Nick().." has been arrested during a robbery!")
 			self:DuringCooldown(ply)
 		elseif (ply:GetPos():Distance(self:GetPos()) > BankConfig.MaxDistance) then
