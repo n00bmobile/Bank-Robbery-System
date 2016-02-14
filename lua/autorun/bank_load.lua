@@ -1,10 +1,12 @@
-MsgN("[BankRS]: Version 1.7.6 Loaded!")
+MsgN("[BankRS]: Version 1.7.8 Loaded!")
 
-if SERVER then
+if (SERVER) then
     AddCSLuaFile("bank_config.lua")
     include("bank_config.lua")
 	
-	resource.AddFile("sound/siren.wav")
+	resource.AddFile("sound/bank_vault/siren.wav")
+	resource.AddFile("resource/fonts/coolvetica.ttf")
+	
 	util.PrecacheSound("siren.wav")
 else	
 	include("bank_config.lua")
