@@ -182,7 +182,7 @@ end
 hook.Add("InitPostEntity", "BankRS_CheckUpdate", function()
 	http.Fetch("https://dl.dropboxusercontent.com/s/90pfxdcg0mtbumu/bankVersion.txt", 
 		function(version)   
-	        if (version > "1.7.8") then 
+	        if (version > "1.7.9") then 
 			    MsgN("[BankRS]: Outdated Version DETECTED!")
 			end
 		end,
@@ -209,9 +209,7 @@ hook.Add("PlayerInitialSpawn", "BankRS_InterestSync", function(ply)
 end)
 
 timer.Create("BankRS_RewardInterest", BankRS_Config["Interest"]["Interest_Delay"], 0, function()
-    BankRS_RewardCurrent = BankRS_RewardCurrent +BankRS_Config["Interest"]["Interest_Amount"]
-	
-	math.Clamp(BankRS_RewardCurrent, BankRS_Config["Interest"]["Base_Reward"], BankRS_Config["Interest"]["Reward_Max"])
+    BankRS_RewardCurrent = math.Clamp(BankRS_RewardCurrent +BankRS_Config["Interest"]["Interest_Amount"], BankRS_Config["Interest"]["Base_Reward"], BankRS_Config["Interest"]["Reward_Max"])
 	BroadcastLua("BankRS_RewardCurrent = "..BankRS_RewardCurrent)
 end)
 

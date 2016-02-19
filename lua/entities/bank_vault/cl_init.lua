@@ -9,6 +9,7 @@ function ENT:Draw()
     if (not self.rotate) then 
 	    self.rotate = 0 
 	end
+	
     if (not self.lasttime) then 
 	    self.lasttime = 0 
 	end
