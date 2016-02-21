@@ -83,12 +83,14 @@ function BankRS_CountTeamNumber()
     local Team = 0
 	local Banker = 0
 	
-	for k, v in pairs(BankRS_Config["Robbery"]["Team_Required"]["Cops"]) do
-	    Team = Team +#team.GetPlayers(v)
-	end
-	
-	for k, v in pairs(BankRS_Config["Robbery"]["Team_Required"]["Bankers"]) do
-	    Banker = Banker +#team.GetPlayers(v)
+	for k, v in pairs(player.GetAll()) do
+	    if (table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Cops"], team.GetName(v:Team()))) then
+		    Team = Team +1
+		end
+		
+		if (table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Bankers"], team.GetName(v:Team()))) then
+		    Banker = Banker +1
+		end
 	end
 	
     if (Team >= BankRS_Config["Robbery"]["Min_Cops"] and Banker >= BankRS_Config["Robbery"]["Min_Bankers"]) then
@@ -182,7 +184,7 @@ end
 hook.Add("InitPostEntity", "BankRS_CheckUpdate", function()
 	http.Fetch("https://dl.dropboxusercontent.com/s/90pfxdcg0mtbumu/bankVersion.txt", 
 		function(version)   
-	        if (version > "1.7.9") then 
+	        if (version > "1.8.0") then 
 			    MsgN("[BankRS]: Outdated Version DETECTED!")
 			end
 		end,
