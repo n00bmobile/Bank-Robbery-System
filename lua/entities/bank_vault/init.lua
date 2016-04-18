@@ -36,8 +36,8 @@ function ENT:SpawnFunction(v, tr)
 end
 
 function ENT:Use(ply)
-	if (not table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Robbers"], team.GetName(ply:Team()))) then
-		DarkRP.notify(ply, 1, 3, "A robbery can't be started as a "..team.GetName(ply:Team()).."!")
+	if (not table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Robbers"], ply:Team())) then
+		DarkRP.notify(ply, 1, 3, "A robbery can't be started as a "..ply:Team().."!")
 		return
 	elseif (ply:isArrested()) then
         DarkRP.notify(ply, 1, 3, "A robbery can't be started while arrested!")
@@ -84,11 +84,11 @@ function BankRS_CountTeamNumber()
 	local Banker = 0
 	
 	for k, v in pairs(player.GetAll()) do
-	    if (table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Cops"], team.GetName(v:Team()))) then
+	    if (table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Cops"], v:Team())) then
 		    Team = Team +1
 		end
 		
-		if (table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Bankers"], team.GetName(v:Team()))) then
+		if (table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Bankers"], v:Team())) then
 		    Banker = Banker +1
 		end
 	end
@@ -115,7 +115,7 @@ function ENT:DuringRobbery(ply)
 		elseif (not ply:Alive()) then
 			DarkRP.notifyAll(1, 5, ply:Nick().." died during a robbery!")
 			self:DuringCooldown(ply)
-		elseif (not table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Robbers"], team.GetName(ply:Team()))) then
+		elseif (not table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Robbers"], ply:Team())) then
 		    DarkRP.notifyAll(1, 5, ply:Nick().." changed jobs during a robbery!")
 			self:DuringCooldown(ply)	
 		elseif (ply:GetPos():Distance(self:GetPos()) > BankRS_Config["Robbery"]["Max_Distance"]) then
