@@ -37,7 +37,7 @@ end
 
 function ENT:Use(ply)
 	if (not table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Robbers"], ply:Team())) then
-		DarkRP.notify(ply, 1, 3, "A robbery can't be started as a "..team. GetName(ply:Team()).."!")
+		DarkRP.notify(ply, 1, 3, "A robbery can't be started as a "..team.GetName(ply:Team()).."!")
 		return
 	elseif (ply:isArrested()) then
         DarkRP.notify(ply, 1, 3, "A robbery can't be started while arrested!")
