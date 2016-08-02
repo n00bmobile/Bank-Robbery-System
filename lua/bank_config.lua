@@ -20,6 +20,6 @@ BankRS_Config = {
 		["Reward_Max"] = 100000, //As high as interest can make the reward go.
 	},
 	["Cooldown"] = {
-	    ["Timer"] = 600, //The amount of time that you need to wait before you can rob the bank again after a failed/sucessfull robbery.
+	    ["Timer"] = 500, //The amount of time that you need to wait before you can rob the bank again after a failed/sucessfull robbery.
 	},
 }

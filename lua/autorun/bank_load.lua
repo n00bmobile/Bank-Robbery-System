@@ -1,4 +1,4 @@
-MsgN("[BankRS]: Version 1.7.8 Loaded!")
+MsgN("[BankRS]: Version 1.8.1 Loaded!")
 
 if (SERVER) then
     AddCSLuaFile("bank_config.lua")
