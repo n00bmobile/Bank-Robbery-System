@@ -3,7 +3,34 @@ AddCSLuaFile("cl_init.lua")
 
 include("shared.lua")
 
-local Robber = nil
+if not bankRobber then --In case someone decides to reload this file...
+    local bankRobber
+end
+
+local function count()
+    local government = 0
+	local banker = 0
+	
+	for k, v in pairs(player.GetAll()) do
+	    if table.HasValue(bank_config.robbery.t_required.cops, team.GetName(v:Team())) then
+		    government = government +1
+		end
+		
+		if table.HasValue(bank_config.robbery.t_required.bankers, team.GetName(v:Team())) then
+		    banker = banker +1
+		end
+	end
+	
+	return government >= bank_config.robbery.m_cops and banker >= bank_config.robbery.m_bankers
+end
+
+local function find()
+    for k, v in pairs(ents.FindByClass("bank_vault")) do
+	    if string.find(v:GetNWString("bankStatus"), "Robbing") then
+		    return v
+		end
+	end
+end
 
 function ENT:Initialize()
 	self.Entity:SetModel("models/props/cs_assault/moneypallet.mdl")
@@ -12,65 +39,52 @@ function ENT:Initialize()
 	self.Entity:PhysicsInit(SOLID_VPHYSICS)
 	self.Entity:SetUseType(SIMPLE_USE)
 	
-	self.Entity:SetNWInt("CurrentReward", BankRS_Config["Interest"]["Base_Reward"]) --set base reward
+	self.Entity:SetNWInt("bankReward", bank_config.interest.base) --set base reward
 	
-	local Physics = self.Entity:GetPhysicsObject()
+	local phys = self.Entity:GetPhysicsObject()
 	
-	if (Physics:IsValid()) then
-	    Physics:EnableMotion(false)
+	if phys:IsValid() then
+	    phys:EnableMotion(false)
 	end
 end
 
-function ENT:SpawnFunction(v, tr)
-    if (not tr.Hit) then return end
-
-	local BankPos = tr.HitPos
-	local Bank = ents.Create("bank_vault") 
-	
-	Bank:SetPos(BankPos)
-	Bank:Spawn()
-	Bank.Owner = v
-	
-	return Bank
-end
-
 function ENT:Use(ply)
-	if (not table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Robbers"], team.GetName(ply:Team()))) then
+	if not table.HasValue(bank_config.robbery.t_required.robbers, team.GetName(ply:Team())) then
 		DarkRP.notify(ply, 1, 3, "A robbery can't be started as a "..team.GetName(ply:Team()).."!")
 		return
-	elseif (ply:isArrested()) then
+	elseif ply:isArrested() then
         DarkRP.notify(ply, 1, 3, "A robbery can't be started while arrested!")
 		return 
-	elseif (#player.GetAll() < BankRS_Config["Robbery"]["Min_Players"]) then
+	elseif #player.GetAll() < bank_config.robbery.m_players then
 		DarkRP.notify(ply, 1, 3, "A robbery can't be started without enough players!")
 	    return
-	elseif (not BankRS_CountTeamNumber()) then
+	elseif not count() then
 		DarkRP.notify(ply, 1, 3, "A robbery can't be started without enough cops or bankers!")
 	    return
-	elseif (timer.Exists("BankRS_RobberyTimer")) then
+	elseif timer.Exists("bank_robbery_timer") then
 		DarkRP.notify(ply, 1, 3, "A robbery is already in progress!")
 	    return
-	elseif (timer.Exists(self:EntIndex().."_CooldownTimer")) then
-        DarkRP.notify(ply, 1, 3, "A robbery can't be started during a cooldown!")
+	elseif timer.Exists("bank_cooldown_timer_"..self:EntIndex()) then
+        DarkRP.notify(ply, 1, 3, "This vault is on cooldown!")
 	    return
     end	
     
     DarkRP.notify(ply, 0, 3, "You started a Bank Robbery!")
     DarkRP.notify(ply, 0, 5, "Don't go too far away or the robbery will fail!")
 	
-	self.EmitSiren = CreateSound(self, "bank_vault/siren.wav")
-	self.EmitSiren:SetSoundLevel(130)
-	self.EmitSiren:Play()
+	self.bankSiren = CreateSound(self, "bank_vault/siren.wav")
+	self.bankSiren:SetSoundLevel(130)
+	self.bankSiren:Play()
 	
-	self:DuringRobbery()
-	ply:wanted(nil, "Robbing The Bank!")
+	self:robberyStart()
 	
-	Robber = ply
+	ply:wanted(nil, "Robbing The Bank!", bank_config.robbery.time)
+	bankRobber = ply
 	
-	if (not BankRS_Config["Robbery"]["Should_Loop"]) then
+	if not bank_config.robbery.loop then
 	    timer.Simple(SoundDuration("bank_vault/siren.wav"), function() 
-		    if (IsValid(self)) then
-			    self.EmitSiren:Stop()
+		    if self:IsValid() then
+			    self.bankSiren:Stop()
             end				
 		end)
 	end
@@ -78,108 +92,99 @@ function ENT:Use(ply)
 	DarkRP.notifyAll(0, 10, ply:Nick().." has started a robbery!")
 end
 
-function BankRS_CountTeamNumber()
-    local Team = 0
-	local Banker = 0
+function ENT:robberyStart()
+    timer.Create("bank_robbery_timer", 1, bank_config.robbery.time, function()
+		local left = timer.RepsLeft("bank_robbery_timer")
+	    
+		self:SetNWString("bankStatus", "Robbing: "..string.ToMinutesSeconds(left))
 	
-	for k, v in pairs(player.GetAll()) do
-	    if (table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Cops"], team.GetName(v:Team()))) then
-		    Team = Team +1
-		end
-		
-		if (table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Bankers"], team.GetName(v:Team()))) then
-		    Banker = Banker +1
-		end
-	end
-	
-    if (Team >= BankRS_Config["Robbery"]["Min_Cops"] and Banker >= BankRS_Config["Robbery"]["Min_Bankers"]) then
-		return true
-    else
-		return false
-    end
-end
-
-function ENT:DuringRobbery()
-	local Robbery = BankRS_Config["Robbery"]["Timer"]
-
-    timer.Create("BankRS_RobberyTimer", 1, 0, function()
-		Robbery = Robbery -1
-		self:SetNWString("Status", "Robbing: "..string.ToMinutesSeconds(Robbery))
-		
-		if (Robber:isArrested()) then
-			DarkRP.notifyAll(1, 5, Robber:Nick().." has been arrested during a robbery!")
-			self:DuringCooldown()
-		elseif (not Robber:Alive()) then
-			DarkRP.notifyAll(1, 5, Robber:Nick().." died during a robbery!")
-			self:DuringCooldown()
-		elseif (not table.HasValue(BankRS_Config["Robbery"]["Team_Required"]["Robbers"], team.GetName(Robber:Team()))) then
-		    DarkRP.notifyAll(1, 5, Robber:Nick().." changed jobs during a robbery!")
-			self:DuringCooldown()	
-		elseif (Robber:GetPos():Distance(self:GetPos()) > BankRS_Config["Robbery"]["Max_Distance"]) then
-		    DarkRP.notifyAll(1, 5, Robber:Nick().." has exited the robbery area!")
-			self:DuringCooldown()
-		elseif (Robbery <= 0) then
-		    DarkRP.notifyAll(0, 5, Robber:Nick().." has finished a robbery!")
+		if left == 0 then
+			bankRobber:addMoney(self:GetNWInt("bankReward"))
+			DarkRP.notifyAll(0, 5, bankRobber:GetName().." has finished a robbery!")
 			
-			Robber:addMoney(self:GetNWInt("CurrentReward"))
-			
-			self:SetNWInt("CurrentReward", BankRS_Config["Interest"]["Base_Reward"])
-			self:DuringCooldown()
+			self:SetNWInt("bankReward", bank_config.interest.base)
+			self:cooldownStart()
         end			
 	end)
+	
+	timer.Start("bank_robbery_timer")
 end
 
-function ENT:DuringCooldown()
-    local Cooldown = BankRS_Config["Cooldown"]["Timer"]
+function ENT:cooldownStart()
+	bankRobber:unWanted()
+	bankRobber = nil
 	
-	Robber:unWanted()
-	Robber = nil
+	self.bankSiren:Stop()
 	
-	self.EmitSiren:Stop()
+    timer.Remove("bank_robbery_timer")	
+	print(timer.Exists("bank_robbery_timer"))
 	
-    timer.Remove("BankRS_RobberyTimer")	
-	timer.Create(self:EntIndex().."_CooldownTimer", 1, 0, function()
-		Cooldown = Cooldown -1
-		self:SetNWString("Status", "Cooldown: "..string.ToMinutesSeconds(Cooldown))
+	timer.Create("bank_cooldown_timer_"..self:EntIndex(), 1, bank_config.cooldown.time, function()
+		local left = timer.RepsLeft("bank_cooldown_timer_"..self:EntIndex())
 		
-		if (Cooldown <= 0) then
-			self:SetNWString("Status", "")
-			timer.Remove(self:EntIndex().."_CooldownTimer")
+		self:SetNWString("bankStatus", "Cooldown: "..string.ToMinutesSeconds(left))
+		
+		if left == 0 then
+			self:SetNWString("bankStatus", "")
 		end
 	end)
+	
+	timer.Start("bank_cooldown_timer_"..self:EntIndex())
+end
+
+function ENT:Think()
+	if timer.Exists("bank_robbery_timer") and find() == self then
+		local name = bankRobber:GetName()
+		
+		if bankRobber:isArrested() then
+	        DarkRP.notifyAll(1, 5, name.." has been arrested during a robbery!")
+			self:cooldownStart()
+	    elseif not table.HasValue(bank_config.robbery.t_required.robbers, team.GetName(bankRobber:Team())) then
+		    DarkRP.notifyAll(1, 5, name.." changed jobs during a robbery!")
+			self:cooldownStart()	
+		elseif not bankRobber:Alive() then
+		    DarkRP.notifyAll(1, 5, name.." died during a robbery!")
+			self:cooldownStart()
+	    elseif bankRobber:GetPos():Distance(self:GetPos()) > bank_config.robbery.m_dist then
+			DarkRP.notifyAll(1, 5, name.." has exited the robbery area!")
+			self:cooldownStart()
+	    end
+	end
 end
 
 function ENT:OnRemove()
-    if (self.EmitSiren) then
-	    self.EmitSiren:Stop()
+    if self.bankSiren then
+	    self.bankSiren:Stop()
 	end
 
-	timer.Remove(self:EntIndex().."_CooldownTimer")
-	timer.Remove("BankRS_RobberyTimer")
+	timer.Remove("bank_cooldown_timer_"..self:EntIndex())
+	timer.Remove("bank_robbery_timer")
 end
 
-function BankRS_AutoSpawn()
-    if (file.Exists("bankrs/"..game.GetMap()..".txt", "DATA")) then
-	    local JSON = util.JSONToTable(file.Read("bankrs/"..game.GetMap()..".txt", "DATA"))
+local function spawn()
+    local map = game.GetMap()
+	
+	if file.Exists("bankrs/"..map..".txt", "DATA") then
+	    local positions = util.JSONToTable(file.Read("bankrs/"..map..".txt", "DATA"))
 
-		for k, v in pairs(JSON) do
-	        local Bank = ents.Create("bank_vault")
+		for k, v in pairs(positions) do
+	        local bank = ents.Create("bank_vault")
 	        
-	        Bank:SetPos(v.pos)
-	        Bank:SetAngles(v.ang)
-	        Bank:Spawn()
+	        bank:SetPos(v.pos)
+	        bank:SetAngles(v.ang)
+	        bank:Spawn()
 		end
 		
-		MsgN("[BankRS]: Loaded "..#JSON.." positions for "..game.GetMap())
+		MsgN("[BankRS]: Loaded "..#positions.." positions for "..map)
 	else
-	    MsgN("[BankRS]: Missing save files for "..game.GetMap())
+	    MsgN("[BankRS]: Missing save files for "..map)
 	end
 end
 
-hook.Add("InitPostEntity", "BankRS_CheckUpdate", function()
+hook.Add("InitPostEntity", "bank_update_check", function()
 	http.Fetch("https://dl.dropboxusercontent.com/s/90pfxdcg0mtbumu/bankVersion.txt", 
 		function(version)   
-	        if (version > "1.8.1") then 
+	        if version > "1.8.2" then 
 			    MsgN("[BankRS]: Outdated Version DETECTED!")
 			end
 		end,
@@ -189,43 +194,47 @@ hook.Add("InitPostEntity", "BankRS_CheckUpdate", function()
 	    end
 	)
 	
-	BankRS_AutoSpawn()
+	spawn()
 end)
 
-hook.Add("PlayerDeath", "BankRS_RewardKiller", function(victim, weapon, attacker)
-    if (Robber == victim and victim != attacker) then
-		DarkRP.notifyAll(0, 10, "Our hero "..attacker:GetName().." has been rewarded "..DarkRP.formatMoney(BankRS_Config["Robbery"]["Killer_Reward"]).." for stopping "..victim:GetName().." from robbing our bank!")
-	    attacker:addMoney(BankRS_Config["Robbery"]["Killer_Reward"])
+hook.Add("PlayerDeath", "bank_reward_killer", function(victim, wep, attacker)
+    if attacker:IsPlayer() and bankRobber == victim and victim ~= attacker then
+		attacker:addMoney(bank_config.robbery.killer_reward)
+		
+		DarkRP.notifyAll(0, 10, "Our hero "..attacker:GetName().." stopped "..bankRobber:GetName().." from robbing the bank!")
+		DarkRP.notify(attacker, 0, 10, "You have been rewarded "..DarkRP.formatMoney(bank_config.robbery.killer_reward).." for stopping a bank robbery!")
 	end
 end)
 
-timer.Create("BankRS_Interest", BankRS_Config["Interest"]["Interest_Delay"], 0, function()
+timer.Create("bank_interest_timer", bank_config.interest.delay, 0, function()
     for k, v in pairs(ents.FindByClass("bank_vault")) do
-		if (v:GetNWString("Status") == "") then
-		    v:SetNWInt("CurrentReward", math.Clamp(v:GetNWInt("CurrentReward") +BankRS_Config["Interest"]["Interest_Amount"], BankRS_Config["Interest"]["Base_Reward"], BankRS_Config["Interest"]["Reward_Max"]))
+		if v:GetNWString("bankStatus") == "" then
+		    v:SetNWInt("bankReward", math.Clamp(v:GetNWInt("bankReward") +bank_config.interest.amount, bank_config.interest.base, bank_config.interest.max))
         end
 	end
 end)
 
-concommand.Add("BankRS_Save", function(ply)
-    if (ply:IsSuperAdmin()) then
-	    if (table.Count(ents.FindByClass("bank_vault")) < 1) then
+timer.Start("bank_interest_timer") --I hope this fixes timers not working for some people...
+
+concommand.Add("banksave", function(ply)
+    if ply:IsSuperAdmin() then
+	    local banks = ents.FindByClass("bank_vault")
+		
+		if table.Count(banks) < 1 then
 		    DarkRP.notify(ply, 1, 5, "There's no bank vaults spawned in this map!")
 		else
-		    local Data = {}
+		    local data = {}
 		
-			for k, BankPos in pairs(ents.FindByClass("bank_vault")) do
-			    table.insert(Data, {pos = BankPos:GetPos(), ang = BankPos:GetAngles()}) 
-			    BankPos:Remove()
+			for k, v in pairs(banks) do
+			    table.insert(data, {pos = v:GetPos(), ang = v:GetAngles()}) 
+			    v:Remove()
 			end
 			
 			file.CreateDir("bankrs")
-			file.Write("bankrs/"..game.GetMap()..".txt", util.TableToJSON(Data))
+			file.Write("bankrs/"..game.GetMap()..".txt", util.TableToJSON(data))
 			
-			DarkRP.notify(ply, 0, 10, "You've saved all of the current bank vaults' positions.")	
-			BankRS_AutoSpawn()
-			
-			MsgN("[BankRS]: "..ply:GetName().." saved "..#Data.." positions in "..game.GetMap())
+			spawn()
+			DarkRP.notify(ply, 0, 10, "You've saved all of the bank vaults currently spawned on the map.")	
 		end
     else
 	    DarkRP.notify(ply, 1, 5, "You don't have permission to execute this command.")
