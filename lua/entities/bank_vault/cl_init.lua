@@ -1,78 +1,81 @@
-include("shared.lua")
+include('shared.lua')
 
-surface.CreateFont("bankFont", {font = "Coolvetica", size = 100}) --I don't know why, but as long as this number is high the font looks fine!
+surface.CreateFont('BankFont', {font = 'Coolvetica', size = 100})
 function ENT:Draw()
-    local pos = self:GetPos()
-    local ang = self:GetAngles()
-	local ang2 = self:GetAngles()
+    self:DrawModel()
 
-    if not self.rotate then 
-	    self.rotate = 0 
-	end
-	
-    if not self.lasttime then 
-	    self.lasttime = 0 
-	end
+    if LocalPlayer():GetPos():DistToSqr(self:GetPos()) <= 250000 then --500^2
+        if not self.DisplayText then
+            self.DisplayText = {}
+            self.DisplayText.Rotation = 0
+            self.DisplayText.LastRotation = 0
+        end
 
-    self.Entity:DrawModel()
+        local pos = self:GetPos()
+        local ang = self:GetAngles()
+        local ang2 = self:GetAngles()
+        local status = self:GetStatus()
+        ang:RotateAroundAxis(ang:Forward(), 90)
+        ang:RotateAroundAxis(ang:Right(), self.DisplayText.Rotation)
+        ang2:RotateAroundAxis(ang2:Forward(), 90)
+        ang2:RotateAroundAxis(ang2:Right(), self.DisplayText.Rotation +180)
+
+        cam.Start3D2D(pos, ang, 0.15) 
+            draw.SimpleTextOutlined(DarkRP.formatMoney(self:GetReward()), 'BankFont', 0, -485, Color(20, 150, 20, 255), 1, 1, 5, color_black)
+        
+            if status == 1 then
+                draw.SimpleTextOutlined('Bank Vault', 'BankFont', 0, -640, color_white, 1, 1, 5, color_black)
+                draw.SimpleTextOutlined('Robbing: '..string.ToMinutesSeconds(math.Clamp(math.Round(self:GetNextAction() -CurTime()), 0, BANK_CONFIG.RobberyTime)), 'BankFont', 0, -565, Color(255, 0, 0), 1, 1, 5, color_black)
+            elseif status == 2 then
+                draw.SimpleTextOutlined('Bank Vault', 'BankFont', 0, -640, color_white, 1, 1, 5, color_black)
+                draw.SimpleTextOutlined('Cooldown: '..string.ToMinutesSeconds(math.Clamp(math.Round(self:GetNextAction() -CurTime()), 0, BANK_CONFIG.CooldownTime)), 'BankFont', 0, -565, Color(255, 0, 0), 1, 1, 5, color_black)
+            else
+                draw.SimpleTextOutlined('Bank Vault', 'BankFont', 0, -565, Color(255, 255, 255, 255), 1, 1, 5, color_black)
+            end
+        cam.End3D2D()
    
-    ang:RotateAroundAxis(ang:Forward(), 90)
-    ang:RotateAroundAxis(ang:Right(), self.rotate)
+        cam.Start3D2D(pos, ang2, 0.15)
+            draw.SimpleTextOutlined(DarkRP.formatMoney(self:GetReward()), 'BankFont', 0, -485, Color(20, 150, 20, 255), 1, 1, 5, color_black)
+        
+            if status == 1 then
+                draw.SimpleTextOutlined('Bank Vault', 'BankFont', 0, -640, color_white, 1, 1, 5, color_black)
+                draw.SimpleTextOutlined('Robbing: '..string.ToMinutesSeconds(math.Clamp(math.Round(self:GetNextAction() -CurTime()), 0, BANK_CONFIG.RobberyTime)), 'BankFont', 0, -565, Color(255, 0, 0), 1, 1, 5, color_black)
+            elseif status == 2 then
+                draw.SimpleTextOutlined('Bank Vault', 'BankFont', 0, -640, color_white, 1, 1, 5, color_black)
+                draw.SimpleTextOutlined('Cooldown: '..string.ToMinutesSeconds(math.Clamp(math.Round(self:GetNextAction() -CurTime()), 0, BANK_CONFIG.CooldownTime)), 'BankFont', 0, -565, Color(255, 0, 0), 1, 1, 5, color_black)
+            else
+                draw.SimpleTextOutlined('Bank Vault', 'BankFont', 0, -565, Color(255, 255, 255, 255), 1, 1, 5, color_black)
+            end	
+        cam.End3D2D()
 
-    ang2:RotateAroundAxis(ang2:Forward(), 90)
-    ang2:RotateAroundAxis(ang2:Right(), self.rotate +180)
+        if self.DisplayText.Rotation > 359 then 
+	        self.DisplayText.Rotation = 0 
+	    end
 
-    cam.Start3D2D(pos, ang, 0.15) 
-        draw.SimpleTextOutlined(DarkRP.formatMoney(self:GetNWInt("bankReward")), "bankFont", 0, -485, Color(20, 150, 20, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 5, Color(0, 0, 0, 255))
-		
-		if self:GetNWString("bankStatus") == "" then   
-			draw.SimpleTextOutlined("Bank Vault", "bankFont", 0, -565, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 5, Color(0, 0, 0, 255))
-		else
-			draw.SimpleTextOutlined("Bank Vault", "bankFont", 0, -640, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 5, Color(0, 0, 0, 255))
-			draw.SimpleTextOutlined(self:GetNWString("bankStatus"), "bankFont", 0, -565, Color(255, 9, 9, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 5, Color(0, 0, 0, 255))
-        end		
-    cam.End3D2D()
-   
-    cam.Start3D2D(pos, ang2, 0.15)
-        draw.SimpleTextOutlined(DarkRP.formatMoney(self:GetNWInt("bankReward")), "bankFont", 0, -485, Color(20, 150, 20, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 5, Color(0, 0, 0, 255))
-		
-		if self:GetNWString("bankStatus") == "" then
-			draw.SimpleTextOutlined("Bank Vault", "bankFont", 0, -565, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 5, Color(0, 0, 0, 255))
-		else
-			draw.SimpleTextOutlined("Bank Vault", "bankFont", 0, -640, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 5, Color(0, 0, 0, 255))
-			draw.SimpleTextOutlined(self:GetNWString("bankStatus"), "bankFont", 0, -565, Color(255, 9, 9, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 5, Color(0, 0, 0, 255))
-        end   
-    cam.End3D2D()
-
-    if self.rotate > 359 then 
-	    self.rotate = 0 
-	end
-
-    self.rotate = self.rotate -50 *(self.lasttime -CurTime())
-    self.lasttime = CurTime()
+        self.DisplayText.Rotation = self.DisplayText.Rotation -50 *(self.DisplayText.LastRotation -CurTime())
+        self.DisplayText.LastRotation = CurTime()
+    end
 end
 
-hook.Add("HUDPaint", "bank_draw_warning_hud", function()
-    if table.HasValue(bank_config.robbery.t_required.cops, team.GetName(LocalPlayer():Team())) then
-	    for k, v in pairs(ents.FindByClass("bank_vault")) do
-            if string.find(v:GetNWString("bankStatus"), "Robbing") then
-		        local pos = (v:GetPos() +Vector(0, 0, 80)):ToScreen()
-		        draw.DrawText(v:GetNWString("bankStatus"), "Default", pos.x, pos.y, color_white, 1)
-            end
-		end
-	end
-end)
-
-hook.Add("PreDrawHalos", "bank_draw_warning_halo", function()
-	if table.HasValue(bank_config.robbery.t_required.cops, team.GetName(LocalPlayer():Team())) then
-	    local onRobbery = {}
-	    
-		for k, v in pairs(ents.FindByClass("bank_vault")) do
-            if string.find(v:GetNWString("bankStatus"), "Robbing") then
-		        table.insert(onRobbery, v)
+hook.Add('HUDPaint', 'BankRS_DrawWarningText', function()
+    if BANK_CONFIG.Government[team.GetName(LocalPlayer():Team())] then
+	    for k, v in pairs(ents.FindByClass('bank_vault')) do
+            if v:GetStatus() == 1 then
+                local pos = (v:GetPos() +Vector(0, 0, 80)):ToScreen()
+		        draw.DrawText('BANK BEING ROBBED', 'Default', pos.x, pos.y, HSVToColor(CurTime() *100 %360, 1, 1), 1)
+                break
 		    end
 		end
-		
-		halo.Add(onRobbery, Color(150, 20, 20), 0, 0, 5, true, true)
+    end
+end)
+
+hook.Add('PreDrawHalos', 'BankRS_DrawWarningHalo', function()
+	if BANK_CONFIG.Government[team.GetName(LocalPlayer():Team())] then
+	    for k, v in pairs(ents.FindByClass('bank_vault')) do
+            if v:GetStatus() == 1 then
+                halo.Add({v}, Color(255, 0, 0), 0, 0, 5, true, true)
+                break
+		    end
+		end
 	end
 end)

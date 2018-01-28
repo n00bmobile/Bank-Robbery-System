@@ -1,8 +1,8 @@
-Bank Robbery System - Bank Robbery System for DarkRP 2.6+
+Bank Robbery System 1.8.3 - Bank Robbery System for DarkRP 2.7+
 Created by n00bmobile (STEAM_0:1:69472670)
-You can contact me through my newly created e-mail: n00bmobile.lua@gmail.com
+You can contact me through my e-mail: n00bmobile.lua@gmail.com
 
-1. Extract the contents of this compressed folder to your addons folder.
-2. Copy the resource folder to garrysmod root folder.
-3. You can configurate this addon by editing bank_config.lua. Just search for it, you lazy! You'll find it for sure!
+1. Extract the master folder to your addons folder.
+2. Configurate the Bank Vault by editing bank_config.lua, all necessary instructions are there.
+3. While in-game place a few Bank Vaults and type 'banksave' in the console to save their positions in the map. 
 4. Report any bugs you find to me ;)

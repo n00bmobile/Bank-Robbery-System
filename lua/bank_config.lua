@@ -1,27 +1,25 @@
-bank_config = {
-    robbery = {
-	    time = 300, --> The amount of time needed to finish a bank robbery.
-		m_dist = 500, --> The maximum distance that you can go from the bank during a robbery.
-		m_cops = 1, --> Minimum number of teams considered cops by the bank needed to start a robbery. (0 to disable)
-		m_bankers = 0, --> Minimum number of teams considered bankers by the bank needed to start a robbery. (0 to disable)
-	    m_players = 2, --> Minimum of players needed to start a robbery. (0 to disable)
-		killer_reward = 1500, --> The reward won by the player who kills the robber.
-		loop = true, --> Should the siren sound loop?
-		t_required = { --> The teams considered cops/robbers/bankers by the bank.
-		    cops = {"Civil Protection", "Civil Protection Chief", "Mendigo"},
-            bankers = {},
-			robbers = {"Mob boss", "Gangster", "Cidadão"},
-		},
-	},
-	
-	interest = {
-		delay = 300, --> The delay between increasing the bank's reward.
-		amount = 1500, --> The amount to increase in each interest.
-		base = 50000, --> The base amount of money without any interest available to rob from the bank.
-		max = 100000, --> As high as interest can make the reward go.
-	},
-	
-	cooldown = {
-	    time = 300, --> The amount of time that you need to wait before you can rob the bank again after a failed/sucessfull robbery.
-	},
+BANK_CONFIG = {} 
+BANK_CONFIG.MinGovernment = 0 -- Minimum number of teams considered cops by the Bank needed to start a robbery. (0 to disable)
+BANK_CONFIG.MinBankers = 0 -- Minimum number of teams considered bankers by the Bank needed to start a robbery. (0 to disable)
+BANK_CONFIG.MinPlayers = 0 -- Minimum of players needed to start a robbery. (0 to disable)
+BANK_CONFIG.BaseReward = 50000 -- The amount of money that each vault starts with.
+BANK_CONFIG.Interest = 5000 -- The amount to increase in each interest.
+BANK_CONFIG.CooldownTime = 540 -- The amount of time that you need to wait before you can rob the bank again after a failed/sucessfull robbery.
+BANK_CONFIG.RobberyTime = 180 --  The amount of time needed to finish a bank robbery.
+BANK_CONFIG.MaxDistance = 500 -- The maximum distance that you can go from the vault during a robbery.
+BANK_CONFIG.LoopSiren = true -- Should the siren sound loop?
+BANK_CONFIG.MaxReward = 300000 -- The maximum reward for a successful robbery.
+BANK_CONFIG.InterestTime = 120 -- The delay between increasing the vault's reward.
+BANK_CONFIG.SaviorReward = 8000 -- The reward for killing the robber.
+BANK_CONFIG.Government = { -- The teams considered cops by the bank.
+    ['Civil Protection'] = true, -- uses the name displayed in the F4 menu. (Uses the name displayed in the F4 menu)
+    ['Example Name'] = true,
+}
+BANK_CONFIG.Bankers = { -- The teams considered bankers by the bank. (Uses the name displayed in the F4 menu)
+    ['Citizen'] = true,
+    ['Example Name'] = true,
+}
+BANK_CONFIG.Robbers = { -- The teams that can rob the vault. (Uses the name displayed in the F4 menu)
+    ['Gangster'] = true, 
+    ['Example Name'] = true,
 }
