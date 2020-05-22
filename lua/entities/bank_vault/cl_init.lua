@@ -1,10 +1,10 @@
 include('shared.lua')
 
-surface.CreateFont('BankFont', {font = 'Coolvetica', size = 100})
+surface.CreateFont('BankFont', {font = 'Coolvetica Rg', size = 100})
 function ENT:Draw()
     self:DrawModel()
 
-    if LocalPlayer():GetPos():DistToSqr(self:GetPos()) <= 250000 then --500^2
+    if LocalPlayer():GetPos():DistToSqr(self:GetPos()) <= 360000 then --600^2
         if not self.DisplayText then
             self.DisplayText = {}
             self.DisplayText.Rotation = 0

@@ -164,7 +164,7 @@ timer.Create('BankRS_ApplyInterest', BANK_CONFIG.InterestTime, 0, function()
 	end
 end)
 
-local function readSaved()
+local function spawnSaved()
 	local read = file.Read('bankrs/'..game.GetMap()..'.txt', 'DATA')
 
 	if read then
@@ -177,33 +177,33 @@ local function readSaved()
 			ent:Spawn()
 		end
 
-		MsgC(Color(255, 0, 0), '(BankRS) ', Color(255, 255, 0), #data..' vaults found and loaded in '..game.GetMap()..'.\n')
+		MsgC(Color(255, 0, 0), '[BankRS] ', Color(255, 255, 0), #data..' vaults found and loaded in '..game.GetMap()..'.\n')
 	else
-		MsgC(Color(255, 0, 0), '(BankRS) ', Color(255, 255, 0), 'No Save Data for '..game.GetMap()..' found.\n')
+		MsgC(Color(255, 0, 0), '[BankRS] ', Color(255, 255, 0), 'No Save Data for '..game.GetMap()..' found.\n')
 	end
 end
 
 hook.Add('InitPostEntity', 'BankRS_SpawnVaults', function()
 	http.Fetch('https://dl.dropboxusercontent.com/s/90pfxdcg0mtbumu/bankVersion.txt', 
 		function(version)   
-	        if version > '1.8.3' then 
-			    MsgC(Color(255, 0, 0), '(BankRS) ', Color(255, 255, 0), 'Outdated version detected, please update.\n')
+	        if version > '1.8.4' then 
+			    MsgC(Color(255, 0, 0), '[BankRS] ', Color(255, 255, 0), 'Outdated version detected, please update.\n')
 			end
 		end,
 	    function(error)
-		    MsgC(Color(255, 0, 0), '(BankRS) ', Color(255, 255, 0), 'Failed to check for updates! ('..error..')\n')
+		    MsgC(Color(255, 0, 0), '[BankRS] ', Color(255, 255, 0), 'Failed to check for updates! ('..error..')\n')
 	    end
 	)
 
-	readSaved()
+	spawnSaved()
 end)
 
 hook.Add('PostCleanupMap', 'BankRS_RespawnVaults', function()
-	MsgC(Color(255, 0, 0), '(BankRS) ', Color(255, 255, 0), 'Cleanup detected! Attempting to respawn vaults...\n')
-	readSaved()
+	MsgC(Color(255, 0, 0), '[BankRS] ', Color(255, 255, 0), 'Cleanup detected! Attempting to respawn vaults...\n')
+	spawnSaved()
 end)
 
-concommand.Add('BankSave', function(ply)
+concommand.Add('bankrs_save', function(ply)
 	if ply:IsSuperAdmin() then
 		local found = ents.FindByClass('bank_vault')
 
@@ -220,9 +220,23 @@ concommand.Add('BankSave', function(ply)
 			
 			file.Write('bankrs/'..game.GetMap()..'.txt', util.TableToJSON(data))
 			DarkRP.notify(ply, 0, 10, 'Saved '..#found..' Bank Vaults.')
-			MsgC(Color(255, 0, 0), '(BankRS) ', Color(255, 255, 0), 'New Save Data for '..game.GetMap()..' containing '..#found..' vaults written.\n')
+			MsgC(Color(255, 0, 0), '[BankRS] ', Color(255, 255, 0), 'New save data for '..game.GetMap()..' containing '..#found..' vaults written.\n')
 		else
 			DarkRP.notify(ply, 1, 5, 'No Bank Vaults found.')
+		end
+	end
+end)
+
+concommand.Add('bankrs_wipe', function(ply)
+	if ply:IsSuperAdmin() then
+		local read = file.Read('bankrs/'..game.GetMap()..'.txt', 'DATA')
+		
+		if read then
+			file.Delete('bankrs/'..game.GetMap()..'.txt')
+			DarkRP.notify(ply, 0, 10, 'Save data erased.')
+			MsgC(Color(255, 0, 0), '[BankRS] ', Color(255, 255, 0), 'Save data for .'..game.GetMap()..' erased!\n')
+		else
+			DarkRP.notify(ply, 1, 5, 'No save data for '..game.GetMap()..' found!')
 		end
 	end
 end)
